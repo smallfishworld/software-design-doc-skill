@@ -33,7 +33,13 @@ If PlantUML is unavailable, use Mermaid if the target environment supports it, o
 
 ## Word / DOCX output
 
-If the user requests a Word document, prefer direct local DOCX manipulation when a company template must be preserved.
+If the user requests a Word document, resolve the DOCX template first:
+
+1. User/company template supplied for the task.
+2. Project-specific HLD/DOCX template.
+3. Built-in `templates/default-software-design-template.docx`.
+
+Prefer direct local DOCX manipulation when a template must be preserved.
 
 Possible local methods, in preference order when available:
 
@@ -42,21 +48,25 @@ Possible local methods, in preference order when available:
 3. Microsoft Word COM automation on Windows when exact Word behaviors such as TOC refresh or advanced fields are required.
 4. Pandoc when the workflow is naturally Markdown-first and exact template fidelity is not critical.
 
-When a template is supplied, preserve its styles, headings, headers/footers, tables, and document conventions as far as the selected tool permits.
+When a template is used, work on a copy and preserve its styles, headings, headers/footers, tables, and document conventions as far as the selected tool permits.
 
-Do not claim that a DOCX file was created if the current environment has no file/document tool capable of creating it. In that case, generate the complete structured content and explain the required local conversion step.
+When no company/project template exists, use the built-in standardized DOCX template rather than starting a blank Word document.
+
+Do not claim that a DOCX file was created if the current environment has no file/document tool capable of creating it. In that case, generate the complete structured content using `templates/default-outline.md` and explain the required local conversion step.
+
+See `references/docx-template.md` for template placeholders and editing rules.
 
 ## Pandoc
 
 Pandoc is optional, not required by the skill. It is useful for converting Markdown to DOCX in fully offline environments.
 
-Example:
+Example with a company template:
 
 ```bash
 pandoc design.md --reference-doc=company-template.docx -o software-design.docx
 ```
 
-Use direct DOCX editing instead when the template contains complex formatting or precise placement that Pandoc may not preserve.
+Pandoc's `--reference-doc` primarily transfers styles; it is not equivalent to directly filling a complex Word template. Prefer direct DOCX editing when cover pages, document-control tables, precise layout, fields, or complex placement must be retained.
 
 ## Requirements documents
 
@@ -75,6 +85,7 @@ The skill itself requires no network calls. For intranet use:
 
 - clone/download the repository outside the isolated network;
 - copy the skill directory into `~/.claude/skills/software-design-doc/` or the project's `.claude/skills/software-design-doc/`;
+- the built-in DOCX template is included in the repository and needs no online download;
 - install optional PlantUML, Python libraries, Pandoc, or MCP servers from approved offline packages if needed;
 - configure Claude/model API base URL and key separately from this skill according to the organization's gateway/API setup.
 
@@ -87,5 +98,5 @@ Always degrade gracefully:
 - no code → requirements-first design;
 - code but no CodeGraph → inspect files directly;
 - no PlantUML → Mermaid/text diagram;
-- no DOCX tool → produce structured source document;
-- no company template → use `templates/default-outline.md`.
+- DOCX tool available but no company template → use `templates/default-software-design-template.docx`;
+- no DOCX tool → produce structured Markdown using `templates/default-outline.md`.
