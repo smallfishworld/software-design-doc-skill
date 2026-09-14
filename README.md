@@ -4,7 +4,9 @@
 
 A general-purpose AI skill for software high-level design (HLD), supporting requirements analysis, codebase analysis, architecture design, module design, interface design, design review, diagrams, and design-document generation across different languages, platforms, and software projects.
 
-The skill supports the full project lifecycle: it can design a new system **from zero when only requirements exist and there is no source code or even no project directory yet**, reverse-engineer an existing codebase when design documentation is missing, or reconcile requirements with implementation when both are available.
+The skill can design a new system **from zero when only requirements exist and there is no source code or even no project directory yet**, reverse-engineer an existing codebase when design documentation is missing, or reconcile requirements with implementation when both are available.
+
+The skill is deliberately scoped to **HLD document creation and review only**. It does not generate project scaffolding, directory trees, source-code skeletons, detailed-design documents, or implementation code.
 
 The skill is designed to work well in offline or intranet environments. Core behavior is instruction-based and does not require Internet access. Optional tools such as CodeGraph, PlantUML, DOCX tooling, or Pandoc can improve analysis and document output when available.
 
@@ -14,6 +16,10 @@ The skill is designed to work well in offline or intranet environments. Core beh
 - **Code-first / Brownfield** — recover the current architecture from an existing codebase.
 - **Hybrid** — combine requirements and source code, checking for gaps and architectural drift.
 - **Review-only** — review an existing architecture/design without generating a full replacement.
+
+## Scope
+
+This skill is intended to finish at the software high-level design document. It may inspect or propose architecture, modules, interfaces, data, fault handling, logging, security, testability, maintainability, risks, and diagrams as needed for the HLD, but it does not continue into project creation or coding.
 
 ## Highlights
 
@@ -87,8 +93,6 @@ Fault/logging/security/testability analysis
 Risks and open decisions
     ↓
 Software HLD document
-    ↓
-Optional project skeleton generation
 ```
 
 ### Existing codebase
