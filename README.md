@@ -21,7 +21,8 @@ The skill is designed to work well in offline or intranet environments. Core beh
 - Architecture, module, data, interface, exception, logging, security, testability, maintainability, and risk analysis
 - Adaptive profiles for backend, web, desktop, embedded Linux, RTOS, MCU, and other software projects
 - Optional architecture diagrams and sequence/data-flow diagrams
-- Optional Word/DOCX generation or company-template filling
+- **Built-in standardized Word/DOCX template** for projects that do not provide a company template
+- Company/project Word template preservation when a custom template is provided
 - Prevents invented implementation details
 - Supports Chinese and English documents
 
@@ -77,6 +78,14 @@ Analyze the current project and generate a software high-level design document d
 Analyze the current codebase and existing requirements. Generate the design in Chinese, identify major requirement/implementation gaps, and use docs/company-template.docx if possible.
 ```
 
+### Word output with no custom template
+
+```text
+/software-design-doc
+Generate the final software high-level design as a Word document.
+No company template is provided; use the built-in standard template.
+```
+
 ### Architecture review only
 
 ```text
@@ -85,6 +94,27 @@ Review the current software architecture only. Do not generate the final documen
 ```
 
 More examples are in `examples/example-request.md`.
+
+## Default Word template
+
+The repository includes:
+
+```text
+templates/default-software-design-template.docx
+```
+
+It is used automatically when Word/DOCX output is requested and no user/company/project template has been specified.
+
+Template priority is:
+
+1. User/company template explicitly supplied for the task
+2. Project-specific HLD/DOCX template
+3. Built-in `templates/default-software-design-template.docx`
+4. `templates/default-outline.md` when DOCX generation is unavailable or Markdown is requested
+
+The built-in Word template contains an A4 cover page, document information, revision history, TOC field, heading styles, header/footer with page-number fields, and standardized tables for architecture/module/data/interface/error/risk content.
+
+See `references/docx-template.md` for placeholder and editing rules.
 
 ## Default document structure
 
@@ -113,7 +143,7 @@ The core skill does not depend on any MCP server. When available, it can make us
 - CodeGraph or equivalent code intelligence tools for dependency/call-graph analysis
 - PlantUML for UML and architecture diagrams
 - DOCX MCP, `python-docx`, Microsoft Word automation, or equivalent tools for direct Word output
-- Pandoc for Markdown-to-DOCX conversion
+- Pandoc for Markdown-to-DOCX conversion when a Markdown-first workflow is preferable
 
 See `references/tool-integration.md` for behavior and fallback rules.
 
@@ -125,7 +155,7 @@ Run:
 python3 scripts/check_environment.py
 ```
 
-This only checks optional local integrations. The core requirements-first and design workflow does not depend on CodeGraph, PlantUML, Pandoc, or an Internet connection.
+This only checks optional local integrations. The core requirements-first and design workflow does not depend on CodeGraph, PlantUML, Pandoc, or an Internet connection. The built-in Word template is already included in the repository.
 
 ## Repository layout
 
@@ -134,13 +164,15 @@ software-design-doc-skill/
 ├── SKILL.md
 ├── README.md
 ├── templates/
-│   └── default-outline.md
+│   ├── default-outline.md
+│   └── default-software-design-template.docx
 ├── references/
 │   ├── architecture-analysis.md
 │   ├── document-rules.md
 │   ├── platform-profiles.md
 │   ├── diagram-guide.md
-│   └── tool-integration.md
+│   ├── tool-integration.md
+│   └── docx-template.md
 ├── examples/
 │   └── example-request.md
 └── scripts/
