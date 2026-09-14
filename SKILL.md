@@ -7,6 +7,17 @@ description: Create or review software high-level design (HLD/概要设计) docu
 
 Create a software high-level design that is traceable to available evidence and useful for implementation and review.
 
+## Scope boundary
+
+This skill is dedicated to software high-level design documents.
+
+- Its primary output is an HLD document or an HLD review.
+- It may analyze requirements, source code, architecture, modules, interfaces, data, risks, and diagrams as needed to produce the document.
+- It does **not** generate project scaffolding, directory trees, source-code skeletons, detailed-design documents, or production implementation code.
+- For greenfield projects, the project may have no source code and no project directory at all. Requirements alone are a valid starting point.
+
+Keep the workflow focused on design-document quality rather than continuing into implementation.
+
 ## Select the working mode first
 
 Choose the mode from the available inputs. Do not require source code when it does not exist.
@@ -47,6 +58,7 @@ Do not expose all tags in the final document unless useful, but preserve the dis
 12. Draft the content using the resolved template and the project-specific analysis.
 13. Run a consistency pass: every important architectural statement must be supported by evidence or clearly presented as a proposal/assumption.
 14. When DOCX output is possible, generate the final Word document from the resolved DOCX template and validate the result. Follow `references/tool-integration.md` and `references/docx-template.md`.
+15. Stop at the completed/reviewed HLD document; do not continue into project scaffolding, detailed design, or code generation.
 
 ## Template priority and fallback
 
@@ -73,6 +85,7 @@ When there is no source code:
 - Mark technology/framework choices as `[DESIGN]` unless explicitly required.
 - Mark missing information as `[ASSUMPTION]` or `[TODO]` rather than silently filling gaps.
 - Ensure major requirements are traceable to one or more architectural elements.
+- Do not create a project tree or source skeleton as an HLD deliverable.
 
 ## Code-first rules
 
@@ -123,6 +136,7 @@ For the built-in DOCX template:
 - Never claim that a proposed design already exists in code.
 - Never fabricate exact priorities, buffer sizes, timeouts, protocols, field widths, database schemas, file names, or resource limits unless supported by evidence or explicitly proposed as a design choice.
 - Avoid textbook chapters that add no project-specific value.
+- Do not append implementation artifacts such as project folders, `.c/.cpp/.h` skeletons, build-system scaffolding, or generated application code to the HLD deliverable.
 
 ## Reference files
 
