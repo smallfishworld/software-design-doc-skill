@@ -34,7 +34,7 @@ Do not expose all tags in the final document unless useful, but preserve the dis
 ## Workflow
 
 1. Identify available inputs and select the working mode.
-2. Read the user's/company template first when one is provided. Its structure has priority over the default outline.
+2. Resolve the document template before drafting. Follow the template priority rules below.
 3. Extract scope, actors, capabilities, constraints, external systems, quality attributes, and important terminology.
 4. Inspect the codebase when code exists. Prefer repository-aware tools such as CodeGraph when available; otherwise inspect files, build definitions, entry points, modules, interfaces, schemas, configuration, tests, and deployment assets directly.
 5. Build an evidence/decision ledger before drafting the final document.
@@ -44,9 +44,22 @@ Do not expose all tags in the final document unless useful, but preserve the dis
 9. Analyze concurrency, state machines, performance/real-time constraints, and deployment only when they materially affect the architecture. Do not force them into standalone chapters by default.
 10. Generate diagrams only when they clarify structure or behavior. Follow `references/diagram-guide.md`.
 11. Review the architecture for cohesion, coupling, dependency direction, ownership, cyclic dependencies, single points of failure, excessive shared state, unclear interfaces, and requirement coverage.
-12. Draft the document using the company/user template when available, otherwise `templates/default-outline.md`.
+12. Draft the content using the resolved template and the project-specific analysis.
 13. Run a consistency pass: every important architectural statement must be supported by evidence or clearly presented as a proposal/assumption.
-14. If a Word/DOCX output is requested, use the best available local document tool. Follow `references/tool-integration.md`.
+14. When DOCX output is possible, generate the final Word document from the resolved DOCX template and validate the result. Follow `references/tool-integration.md` and `references/docx-template.md`.
+
+## Template priority and fallback
+
+Resolve templates in this order:
+
+1. **User/company DOCX template explicitly supplied for this task** — highest priority. Preserve its chapter structure and styles unless the user asks to change them.
+2. **Project-specific template** — use an HLD/DOCX template found in the project when it is clearly intended for this document.
+3. **Built-in standardized DOCX template** — `templates/default-software-design-template.docx`.
+4. **Markdown content outline fallback** — `templates/default-outline.md`, used when DOCX generation/editing is unavailable or the user explicitly wants Markdown.
+
+If the user requests a Word document and does not specify a template, use `templates/default-software-design-template.docx` by default. Work on a copy; never overwrite the built-in template itself.
+
+The DOCX template controls appearance and standard document-control sections. The Markdown outline controls semantic/content guidance. A company DOCX template may override the built-in chapter structure.
 
 ## Requirements-first rules
 
@@ -83,11 +96,21 @@ When requirements and code both exist:
 
 ## Default document behavior
 
-Use the compact default outline in `templates/default-outline.md` only when the user/company does not provide a template.
+When no user/company template is supplied, use the built-in standardized DOCX template for Word output and `templates/default-outline.md` as the content guide.
 
 Do **not** create standalone chapters for concurrency/tasking, state machines, performance/real-time behavior, or build/deployment unless explicitly requested or clearly necessary. Integrate those topics into Overall Architecture, Module Design, Data Design, Interface Design, or Risks as appropriate.
 
-Security is conditional: include it when the system has authentication, authorization, sensitive data, network exposure, update mechanisms, safety/security requirements, or other meaningful security concerns. Otherwise keep it concise or omit it.
+Security is conditional: include it when the system has authentication, authorization, sensitive data, network exposure, update mechanisms, safety/security requirements, or other meaningful security concerns. Otherwise keep it concise or remove the optional section from the final document.
+
+For the built-in DOCX template:
+
+- Replace document-control placeholders such as project, document ID, version, author, reviewer, approver, date, scope, and department when values are known.
+- Do not guess unknown administrative metadata; leave a clear placeholder or mark it pending.
+- Replace instructional placeholder text with project-specific content.
+- Duplicate module subsections/tables as needed and remove unused sample rows.
+- Remove optional sections that are not relevant rather than filling them with generic prose.
+- Insert architecture/flow diagrams in the corresponding sections when available.
+- Update the table of contents and page fields when the available Word/DOCX tool supports field updates; otherwise preserve the fields for Word to update on open.
 
 ## Writing rules
 
@@ -110,3 +133,4 @@ Read only the references needed for the current task:
 - `references/platform-profiles.md` — platform-specific analysis hints
 - `references/diagram-guide.md` — choosing useful diagrams
 - `references/tool-integration.md` — optional CodeGraph, PlantUML, DOCX, Pandoc, and fallback behavior
+- `references/docx-template.md` — built-in Word template usage and placeholder rules
