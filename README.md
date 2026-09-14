@@ -1,21 +1,24 @@
 # Software Design Document Skill
 
+**English | [简体中文](README.zh-CN.md)**
+
 A general-purpose AI skill for software high-level design (HLD), supporting requirements analysis, codebase analysis, architecture design, module design, interface design, design review, diagrams, and design-document generation across different languages, platforms, and software projects.
 
-The skill supports the full project lifecycle: it can design a new system from requirements when no code exists, reverse-engineer an existing codebase when design documentation is missing, or reconcile requirements with implementation when both are available.
+The skill supports the full project lifecycle: it can design a new system **from zero when only requirements exist and there is no source code or even no project directory yet**, reverse-engineer an existing codebase when design documentation is missing, or reconcile requirements with implementation when both are available.
 
 The skill is designed to work well in offline or intranet environments. Core behavior is instruction-based and does not require Internet access. Optional tools such as CodeGraph, PlantUML, DOCX tooling, or Pandoc can improve analysis and document output when available.
 
 ## Working modes
 
-- **Requirements-first / Greenfield** — generate a proposed HLD from requirements before implementation starts.
+- **Requirements-first / Greenfield** — generate a proposed HLD directly from requirements before a code project exists. No source tree or project skeleton is required.
 - **Code-first / Brownfield** — recover the current architecture from an existing codebase.
 - **Hybrid** — combine requirements and source code, checking for gaps and architectural drift.
 - **Review-only** — review an existing architecture/design without generating a full replacement.
 
 ## Highlights
 
-- Requirements-driven design works even when there is no source code yet
+- Start from zero with only a requirement document or even plain-text requirements
+- Requirements-driven design works without an existing code project
 - Requirements and source-code driven design instead of generic prose generation
 - Evidence-aware writing: distinguishes confirmed facts, requirements, design proposals, assumptions, and unresolved items
 - Architecture, module, data, interface, exception, logging, security, testability, maintainability, and risk analysis
@@ -42,7 +45,7 @@ Then start Claude Code and invoke:
 /software-design-doc
 ```
 
-Claude Code also discovers the skill automatically when a request matches its description.
+Claude Code can also discover the skill automatically when a request matches its description.
 
 ### Project-level skill
 
@@ -53,15 +56,39 @@ cp -r /path/to/software-design-doc-skill/* .claude/skills/software-design-doc/
 
 Project-level installation is useful when a project needs its own template or design conventions.
 
+> For a brand-new project, installation does **not** mean you need to create the target software project first. The skill can run from any working directory and consume an external requirement document to design the system from zero.
+
 ## Example requests
 
-### New project, no code yet
+### New project, no code and no project directory yet
 
 ```text
 /software-design-doc
-This is a new project. There is no source code yet.
-Read docs/requirements.docx and generate a software high-level design in Chinese.
+This is a brand-new project. No source code or project skeleton exists yet.
+Read requirements.docx and generate a software high-level design in Chinese.
 Treat architecture/module/interface choices as proposed design decisions and list assumptions explicitly.
+```
+
+Typical flow:
+
+```text
+Requirements
+    ↓
+System scope and boundaries
+    ↓
+Architecture proposal
+    ↓
+Module decomposition
+    ↓
+Interfaces and data design
+    ↓
+Fault/logging/security/testability analysis
+    ↓
+Risks and open decisions
+    ↓
+Software HLD document
+    ↓
+Optional project skeleton generation
 ```
 
 ### Existing codebase
@@ -163,6 +190,7 @@ This only checks optional local integrations. The core requirements-first and de
 software-design-doc-skill/
 ├── SKILL.md
 ├── README.md
+├── README.zh-CN.md
 ├── templates/
 │   ├── default-outline.md
 │   └── default-software-design-template.docx
