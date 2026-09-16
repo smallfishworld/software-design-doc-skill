@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Check optional local tools used by software-design-doc-skill.
+"""Lightweight capability check for software-design-doc-skill.
 
-The skill itself does not require these tools. This script only reports which
-optional integrations appear to be available in an offline/intranet machine.
+Only verifies that relevant commands/modules can be invoked. It intentionally
+does not render test diagrams or create test artifacts.
 """
 
 from __future__ import annotations
@@ -33,39 +33,56 @@ def command_version(name: str, args: list[str]) -> Check:
             timeout=5,
             check=False,
         )
-        first_line = (result.stdout or "").strip().splitlines()
-        detail = first_line[0] if first_line else path
-        return Check(name, True, detail)
-    except Exception as exc:  # environment check must never fail hard
-        return Check(name, True, f"found at {path}; version check failed: {exc}")
+        lines = (result.stdout or "").strip().splitlines()
+        detail = lines[0] if lines else path
+        if result.returncode == 0:
+            return Check(name, True, detail)
+        return Check(name, False, f"command returned {result.returncode}: {detail}")
+    except Exception as exc:
+        return Check(name, False, f"command check failed: {exc}")
 
 
 def python_module(name: str, display: str | None = None) -> Check:
     available = importlib.util.find_spec(name) is not None
-    return Check(display or name, available, "Python module available" if available else "Python module not installed")
+    return Check(
+        display or name,
+        available,
+        "Python module available" if available else "Python module not installed",
+    )
 
 
 def main() -> int:
     checks = [
         command_version("claude", ["--version"]),
+        command_version("plantuml", ["-version"]),
+        command_version("mmdc", ["--version"]),
         command_version("java", ["-version"]),
         command_version("pandoc", ["--version"]),
         command_version("dot", ["-V"]),
         python_module("docx", "python-docx"),
     ]
 
-    print("Software Design Document Skill - Optional Environment Check")
+    print("Software Design Document Skill - Capability Check")
     print("=" * 64)
     for check in checks:
         state = "OK" if check.available else "--"
         print(f"[{state:>2}] {check.name:<16} {check.detail}")
 
+    print("\nDiagram fallback:")
+    plantuml = next(c for c in checks if c.name == "plantuml")
+    mermaid = next(c for c in checks if c.name == "mmdc")
+    if plantuml.available:
+        print("- PlantUML available: prefer PlantUML for HLD diagrams.")
+    elif mermaid.available:
+        print("- PlantUML unavailable; Mermaid renderer available: use Mermaid.")
+    else:
+        print("- No PlantUML/Mermaid renderer detected: use text/ASCII descriptions.")
+
     print("\nNotes:")
-    print("- Only Claude Code plus the skill files are needed for core use.")
-    print("- Requirements-first design works without source code or CodeGraph.")
-    print("- Java is useful when running a local PlantUML JAR.")
-    print("- python-docx/Pandoc are optional ways to produce DOCX output.")
-    print("- CodeGraph/MCP availability is configured separately and is not auto-detected here.")
+    print("- This is a lightweight command/module check; no test diagram is rendered.")
+    print("- A PlantUML JAR installation may be usable through Java even if the plantuml command is absent.")
+    print("- CodeGraph/MCP availability is agent-specific and must be checked from the current tool context when code exists.")
+    print("- Missing optional tools must not block the core HLD workflow; use the documented fallback chain.")
     return 0
 
 
