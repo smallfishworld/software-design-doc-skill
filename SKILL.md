@@ -18,7 +18,38 @@ This skill is dedicated to software high-level design documents.
 
 Keep the workflow focused on design-document quality rather than continuing into implementation.
 
-## Select the working mode first
+## Mandatory startup capability check
+
+At the beginning of every run, perform a lightweight capability check before architecture analysis or document drafting. The purpose is to discover which local tools can actually be used during this run.
+
+Prefer running `python3 scripts/check_environment.py` when the script is accessible. If it cannot be run, perform equivalent lightweight command/module checks directly.
+
+Check relevant capabilities without generating test artifacts:
+
+- PlantUML: check whether the `plantuml` command can execute. If the installation uses a local JAR instead, check Java and the configured PlantUML JAR invocation.
+- Mermaid: check an available Mermaid renderer such as `mmdc --version` when present.
+- Java: `java -version`, when relevant to PlantUML.
+- Pandoc: `pandoc --version`.
+- DOCX: check whether `python-docx`, a document/DOCX tool, or another usable Word-generation mechanism is available.
+- CodeGraph/MCP: when code exists, inspect whether a repository-aware code-analysis tool is exposed to the current agent. Do not require it for greenfield work.
+
+A command counts as available only when it is found and its lightweight check executes successfully. Do not perform expensive rendering or create test diagrams merely to verify availability.
+
+Keep successful checks quiet unless the user asks for diagnostics. Report missing tools only when their absence affects the requested deliverable or causes a fallback.
+
+### Diagram tool priority
+
+Use the following rendering priority for diagrams:
+
+1. **PlantUML** — preferred when available.
+2. **Mermaid** — fallback when PlantUML is unavailable and a Mermaid renderer is usable.
+3. **Text/ASCII + structured description** — final fallback when neither renderer is usable.
+
+When PlantUML is available and a diagram materially improves the HLD, actually use PlantUML to produce the diagram; do not ignore it and silently switch to another format. Preserve diagram source when practical.
+
+If Mermaid source can be written but cannot be rendered for the requested final DOCX, do not present raw Mermaid source as a finished diagram in the Word document. Fall back to a structured text/table description or another renderable mechanism.
+
+## Select the working mode
 
 Choose the mode from the available inputs. Do not require source code when it does not exist.
 
@@ -44,21 +75,22 @@ Do not expose all tags in the final document unless useful, but preserve the dis
 
 ## Workflow
 
-1. Identify available inputs and select the working mode.
-2. Resolve the document template before drafting. Follow the template priority rules below.
-3. Extract scope, actors, capabilities, constraints, external systems, quality attributes, and important terminology.
-4. Inspect the codebase when code exists. Prefer repository-aware tools such as CodeGraph when available; otherwise inspect files, build definitions, entry points, modules, interfaces, schemas, configuration, tests, and deployment assets directly.
-5. Build an evidence/decision ledger before drafting the final document.
-6. Define or recover the system context and architectural boundaries.
-7. Define or recover modules/components and their responsibilities, ownership, dependencies, and interfaces.
-8. Analyze important data, control flow, lifecycle, error/fault paths, and persistence where relevant.
-9. Analyze concurrency, state machines, performance/real-time constraints, and deployment only when they materially affect the architecture. Do not force them into standalone chapters by default.
-10. Generate diagrams only when they clarify structure or behavior. Follow `references/diagram-guide.md`.
-11. Review the architecture for cohesion, coupling, dependency direction, ownership, cyclic dependencies, single points of failure, excessive shared state, unclear interfaces, and requirement coverage.
-12. Draft the content using the resolved template and the project-specific analysis.
-13. Run a consistency pass: every important architectural statement must be supported by evidence or clearly presented as a proposal/assumption.
-14. When DOCX output is possible, generate the final Word document from the resolved DOCX template and validate the result. Follow `references/tool-integration.md` and `references/docx-template.md`.
-15. Stop at the completed/reviewed HLD document; do not continue into project scaffolding, detailed design, or code generation.
+1. Run the mandatory startup capability check and record usable tools for this run.
+2. Identify available inputs and select the working mode.
+3. Resolve the document template before drafting. Follow the template priority rules below.
+4. Extract scope, actors, capabilities, constraints, external systems, quality attributes, and important terminology.
+5. Inspect the codebase when code exists. Prefer repository-aware tools such as CodeGraph when available; otherwise inspect files, build definitions, entry points, modules, interfaces, schemas, configuration, tests, and deployment assets directly.
+6. Build an evidence/decision ledger before drafting the final document.
+7. Define or recover the system context and architectural boundaries.
+8. Define or recover modules/components and their responsibilities, ownership, dependencies, and interfaces.
+9. Analyze important data, control flow, lifecycle, error/fault paths, and persistence where relevant.
+10. Analyze concurrency, state machines, performance/real-time constraints, and deployment only when they materially affect the architecture. Do not force them into standalone chapters by default.
+11. Generate diagrams only when they clarify structure or behavior. Use PlantUML > Mermaid > Text/ASCII according to the startup capability check. Follow `references/diagram-guide.md`.
+12. Review the architecture for cohesion, coupling, dependency direction, ownership, cyclic dependencies, single points of failure, excessive shared state, unclear interfaces, and requirement coverage.
+13. Draft the content using the resolved template and the project-specific analysis.
+14. Run a consistency pass: every important architectural statement must be supported by evidence or clearly presented as a proposal/assumption.
+15. When DOCX output is possible, generate the final Word document from the resolved DOCX template and validate the result. Follow `references/tool-integration.md` and `references/docx-template.md`.
+16. Stop at the completed/reviewed HLD document; do not continue into project scaffolding, detailed design, or code generation.
 
 ## Template priority and fallback
 
