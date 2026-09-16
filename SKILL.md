@@ -1,184 +1,101 @@
 ---
 name: software-design-doc
-description: Create or review software high-level design (HLD/概要设计) documents from requirements, source code, existing documentation, or any combination of them. Supports greenfield projects with no code, brownfield code reverse-engineering, and requirement-code consistency analysis across languages and platforms.
+description: Create, update, or review software high-level design (HLD/概要设计) documents from requirements, source code, or existing designs. Use for requirements-first design, architecture reverse-engineering, and requirement-code consistency reviews. Produces design documents or review findings, not application code or detailed design.
 ---
 
 # Software Design Document
 
-Create a software high-level design that is traceable to available evidence and useful for implementation and review.
+Produce a software High-Level Design (HLD，软件概要设计) that is traceable to evidence and useful for implementation and review. Requirements alone are valid input; no project directory or code skeleton is required. Stop at the requested document or review, without creating application code, project scaffolding, or a detailed design.
 
-## Scope boundary
+## 1. Resolve the task before doing work
 
-This skill is dedicated to software high-level design documents.
+Identify the requested scope, language, output format, available inputs, and any company template. Preserve explicit choices and existing authorization. If the format is unspecified, follow an existing document's format; otherwise draft in Markdown without generating an unsolicited Word file.
 
-- Its primary output is an HLD document or an HLD review.
-- It may analyze requirements, source code, architecture, modules, interfaces, data, risks, and diagrams as needed to produce the document.
-- It does **not** generate project scaffolding, directory trees, source-code skeletons, detailed-design documents, or production implementation code.
-- For greenfield projects, the project may have no source code and no project directory at all. Requirements alone are a valid starting point.
+Select the input mode independently of the deliverable:
 
-Keep the workflow focused on design-document quality rather than continuing into implementation.
+| Input mode | Factual baseline | Main action |
+| --- | --- | --- |
+| Requirements-first / Greenfield | Requirements, constraints, user decisions | Propose architecture; do not imply it is implemented |
+| Code-first / Brownfield | Active source, configuration, build targets | Recover current architecture; separate recommendations |
+| Hybrid | Both requirements and implementation | Preserve intended and observed behavior; explain gaps |
 
-## Mandatory startup capability check
+For **review-only**, apply the relevant input mode but return findings, not a replacement HLD. For **updates**, inspect the existing document first and change affected sections, diagrams, references, and cross-references; preserve unrelated approved content and styles.
 
-At the beginning of every run, perform a lightweight capability check before architecture analysis or document drafting. The purpose is to discover which local tools can actually be used during this run.
+Ask only when an unresolved choice materially changes scope or architecture and cannot be handled as an explicit assumption. Continue other useful work. Do not invent unavailable input contents or exact implementation parameters.
 
-Prefer running `python3 scripts/check_environment.py` when the script is accessible. If it cannot be run, perform equivalent lightweight command/module checks directly.
+## 2. Check capabilities relevant to this deliverable
 
-Check relevant capabilities without generating test artifacts:
+Perform a lightweight capability check before analysis/drafting, scoped to the selected output. Resolve bundled paths relative to this `SKILL.md`, not the user's current project directory.
 
-- PlantUML: check whether the `plantuml` command can execute. If the installation uses a local JAR instead, check Java and the configured PlantUML JAR invocation.
-- Mermaid CLI: run `mmdc --version`. If it succeeds, treat Mermaid CLI as available and use `mmdc` directly to render Mermaid diagrams when needed.
-- Java: `java -version`, when relevant to PlantUML.
-- Pandoc: `pandoc --version`.
-- DOCX: check whether `python-docx`, a document/DOCX tool, or another usable Word-generation mechanism is available.
-- CodeGraph/MCP: when code exists, inspect whether a repository-aware code-analysis tool is exposed to the current agent. Do not require it for greenfield work.
+- Code inputs: inspect exposed repository tools such as CodeGraph; skip for projects without code. Verify their repository/revision matches the task.
+- Diagrams: `python3 <skill-root>/scripts/check_environment.py --scope diagrams`.
+- Word output: use `--scope docx`; add `--scope diagrams` if diagrams are planned.
+- Text-only review: no renderer/Word checks are needed. No-argument invocation is an optional full diagnostic.
+- If the script cannot run, inspect equivalent commands/modules directly. Use `--plantuml-jar <path>` for a known JAR installation.
 
-A command counts as available only when it is found and its lightweight check executes successfully. Do not perform expensive rendering or create test diagrams merely to verify availability.
+The check creates no test artifacts. Command discovery/version success is **not** proof of rendering or conversion success. Keep successful checks quiet; report a limitation only when it affects the requested output. Missing optional tools must not block analysis.
 
-Keep successful checks quiet unless the user asks for diagnostics. Report missing tools only when their absence affects the requested deliverable or causes a fallback.
+## 3. Establish evidence and design boundaries
 
-### Diagram tool selection
+Read [document-rules.md](references/document-rules.md) for evidence, conflicts, and traceability. Classify important claims as `[REQ]`, `[CODE]`, `[DOC]`, `[DESIGN]`, `[ASSUMPTION]`, or `[TODO]`; retain a source locator for confirmed claims. The final document need not display every internal tag, but proposals and uncertainty must remain visible.
 
-Select the diagram tool by diagram semantics rather than forcing every diagram into UML:
+- Requirements-first: derive responsibilities from capabilities and constraints. Technology, module, and interface choices are proposals unless explicitly required. Map major requirements to architectural owners and record consequential alternatives.
+- Code-first: inspect active build targets, entry points, public interfaces, configuration, data ownership, and important flows. Naming and directory proximity do not prove dependencies. Check relevant symbols/files behind tool summaries; report analysis coverage and gaps.
+- Hybrid: keep requirement truth and implementation truth separate. “No implementation evidence found” is not proof of nonimplementation without sufficient coverage. Separate the current state from the proposed target state.
 
-- **UML and software-architecture modeling**: prefer PlantUML when available. Examples include component, class, sequence, state, activity, deployment, and other UML-oriented diagrams.
-- **General flowcharts, tree/hierarchy diagrams, functional decomposition, mind maps, and general relationship diagrams**: prefer Mermaid.
-- If the preferred PlantUML path is unavailable, use Mermaid as the fallback when `mmdc` is available.
+For architecture analysis use [architecture-analysis.md](references/architecture-analysis.md). Read only relevant sections of [platform-profiles.md](references/platform-profiles.md) for platform-specific concerns. Do not load every reference by default.
 
-When `mmdc --version` succeeds, generate the `.mmd` source and invoke Mermaid CLI directly to render the diagram, preferably to SVG for document-quality vector output or PNG when required by the DOCX pipeline.
+## 4. Design or recover the architecture
 
-Do **not** use Text/ASCII diagrams as finished HLD diagrams. If neither PlantUML nor Mermaid CLI can render a required diagram in the current environment, preserve the appropriate `.puml` or `.mmd` source and report that rendering must be completed in an environment with the corresponding renderer (for example, Windows with Mermaid CLI) before final document delivery.
+Work at system/module/interface granularity:
 
-When PlantUML is available and a UML/software-architecture diagram materially improves the HLD, actually use PlantUML to produce it. When Mermaid is selected and `mmdc` is available, actually invoke `mmdc`; do not merely emit Mermaid source and treat it as a finished diagram.
+1. Establish system context, scope, external actors, constraints, and architectural drivers.
+2. Define or recover modules, responsibilities, dependency direction, interface contracts, and data/resource ownership.
+3. Trace critical control/data flows, lifecycle, and fault/recovery paths end to end.
+4. Record significant choices, alternatives, consequences, and unresolved validation items.
+5. Check requirement coverage, cohesion, coupling, cycles, shared mutable state, and failure containment.
 
-## Select the working mode
+Analyze concurrency, state, timing, resource budgets, and deployment when they affect the architecture. **Do not create standalone chapters for task/concurrency design, state-machine design, performance/real-time design, or build/deployment/upgrade unless the user or required company template explicitly requests them.** Integrate relevant findings into architecture, module, data, interface, or risk sections.
 
-Choose the mode from the available inputs. Do not require source code when it does not exist.
+Never fabricate priorities, buffer sizes, timeouts, protocols, field widths, schema details, filenames, or resource limits. Give evidence, identify a proposed value with rationale, or record the missing decision.
 
-- **Requirements-first / Greenfield**: requirements exist, implementation does not. Derive a proposed architecture and clearly treat implementation choices as design decisions, not existing facts.
-- **Code-first / Brownfield**: source code exists but design documentation is missing or outdated. Reverse-engineer the current architecture from code and configuration.
-- **Hybrid**: both requirements and code exist. Reconcile intended behavior with implemented behavior and identify gaps or drift.
-- **Review-only**: review an existing design without generating a full replacement unless requested.
+## 5. Draft or review the requested deliverable
 
-If inputs are incomplete, continue with reasonable assumptions but record them explicitly. Do not invent implementation facts.
+### Document creation and updates
 
-## Evidence classes
+Use this template priority:
 
-Track information internally using these classes:
+1. User/company template explicitly supplied for the task.
+2. Project-specific HLD template clearly intended for this document.
+3. [Built-in DOCX template](templates/default-software-design-template.docx) for Word output.
+4. [Default outline](templates/default-outline.md) for Markdown or when Word generation is unavailable.
 
-- `[REQ]` confirmed by requirements or user-provided specification
-- `[CODE]` confirmed by source code, configuration, build files, schemas, or generated code
-- `[DOC]` confirmed by existing project documentation
-- `[DESIGN]` proposed by this design process
-- `[ASSUMPTION]` necessary assumption that still needs confirmation
-- `[TODO]` unresolved item or decision
+A required company template controls chapter structure and styles; the default outline supplies content guidance only where compatible. Work on a copy of any template. Keep unknown administrative metadata pending, remove instructional/sample text, and remove irrelevant optional sections while fixing numbering and references. Keep security content proportional to actual trust boundaries and requirements.
 
-Do not expose all tags in the final document unless useful, but preserve the distinction while reasoning and reviewing.
+For Word output read [docx-template.md](references/docx-template.md) and the Word section of [tool-integration.md](references/tool-integration.md). Preserve template layout, styles, headers/footers, and fields. If Word cannot be created, deliver useful structured content and explicitly identify the conversion still needed; do not label it a completed DOCX.
 
-## Workflow
+### Review-only
 
-1. Run the mandatory startup capability check and record usable tools for this run.
-2. Identify available inputs and select the working mode.
-3. Resolve the document template before drafting. Follow the template priority rules below.
-4. Extract scope, actors, capabilities, constraints, external systems, quality attributes, and important terminology.
-5. Inspect the codebase when code exists. Prefer repository-aware tools such as CodeGraph when available; otherwise inspect files, build definitions, entry points, modules, interfaces, schemas, configuration, tests, and deployment assets directly.
-6. Build an evidence/decision ledger before drafting the final document.
-7. Define or recover the system context and architectural boundaries.
-8. Define or recover modules/components and their responsibilities, ownership, dependencies, and interfaces.
-9. Analyze important data, control flow, lifecycle, error/fault paths, and persistence where relevant.
-10. Analyze concurrency, state machines, performance/real-time constraints, and deployment only when they materially affect the architecture. Do not force them into standalone chapters by default.
-11. Generate diagrams only when they clarify structure or behavior. Select PlantUML or Mermaid by diagram semantics and use the detected CLI/rendering capability. Do not use Text/ASCII as a finished diagram fallback. Follow `references/diagram-guide.md`.
-12. Review the architecture for cohesion, coupling, dependency direction, ownership, cyclic dependencies, single points of failure, excessive shared state, unclear interfaces, and requirement coverage.
-13. Draft the content using the resolved template and the project-specific analysis.
-14. Run a consistency pass: every important architectural statement must be supported by evidence or clearly presented as a proposal/assumption.
-15. When DOCX output is possible, generate the final Word document from the resolved DOCX template and validate the result. Follow `references/tool-integration.md` and `references/docx-template.md`.
-16. Stop at the completed/reviewed HLD document; do not continue into project scaffolding, detailed design, or code generation.
+Read the review section of [document-rules.md](references/document-rules.md). Lead with actionable findings ordered by impact. Each finding needs a document/source location, evidence, consequence, and concrete correction; distinguish confirmed defects from questions and recommendations. State coverage and remaining uncertainty. If no significant issue is found, say so without inventing findings. Do not run a full document-generation workflow for a review.
 
-## Template priority and fallback
+## 6. Create useful diagrams
 
-Resolve templates in this order:
+Read [diagram-guide.md](references/diagram-guide.md) when diagrams clarify the design. It owns tool selection and fallback rules:
 
-1. **User/company DOCX template explicitly supplied for this task** — highest priority. Preserve its chapter structure and styles unless the user asks to change them.
-2. **Project-specific template** — use an HLD/DOCX template found in the project when it is clearly intended for this document.
-3. **Built-in standardized DOCX template** — `templates/default-software-design-template.docx`.
-4. **Markdown content outline fallback** — `templates/default-outline.md`, used when DOCX generation/editing is unavailable or the user explicitly wants Markdown.
+- UML (Unified Modeling Language，统一建模语言) / software architecture: PlantUML first; on failure/unavailability, try an appropriate Mermaid representation.
+- Flowcharts, trees, functional decomposition, and general relationships: Mermaid first.
+- Render actual sources when a local renderer is usable; validate the produced image, not just a version command or exit code.
+- If Mermaid cannot render on the current Linux environment, preserve `.mmd`, provide Windows `mmdc` commands, and identify the target section/caption. Insert rendered images before declaring the Word document final.
+- Never substitute ASCII drawings or raw diagram code for finished Word diagrams. Continue the textual design and deliver a clearly identified draft plus pending rendering steps when necessary.
 
-If the user requests a Word document and does not specify a template, use `templates/default-software-design-template.docx` by default. Work on a copy; never overwrite the built-in template itself.
+Keep editable sources alongside final diagrams. Do not send project sources to an external rendering service without authorization.
 
-The DOCX template controls appearance and standard document-control sections. The Markdown outline controls semantic/content guidance. A company DOCX template may override the built-in chapter structure.
+## 7. Completion checks
 
-## Requirements-first rules
-
-When there is no source code:
-
-- Treat the requirements as the factual baseline.
-- Derive architecture from business/system responsibilities and constraints, not from imagined classes or filenames.
-- Propose modules at the level needed for implementation planning; avoid premature function-level detail.
-- For each proposed module, state responsibility, provided interfaces, required dependencies, key data, and major failure cases.
-- Capture architectural decisions and alternatives when the requirement does not determine a unique solution.
-- Mark technology/framework choices as `[DESIGN]` unless explicitly required.
-- Mark missing information as `[ASSUMPTION]` or `[TODO]` rather than silently filling gaps.
-- Ensure major requirements are traceable to one or more architectural elements.
-- Do not create a project tree or source skeleton as an HLD deliverable.
-
-## Code-first rules
-
-When code exists:
-
-- Prefer observable implementation over naming assumptions.
-- Identify entry points, build targets, module boundaries, dependencies, interfaces, schemas, IPC/network boundaries, persistence, and external integrations.
-- For C/C++/embedded projects also inspect tasks/threads, timers, queues, semaphores/mutexes, ISR/DMA paths, drivers, buffers, ownership, and initialization order when relevant.
-- For service/web projects inspect API routes, service boundaries, asynchronous jobs, databases, caches, queues, external services, and deployment configuration when relevant.
-- Do not describe dead code or unused modules as active architecture without evidence.
-
-## Hybrid rules
-
-When requirements and code both exist:
-
-- Separate intended design from observed implementation.
-- Identify requirements with no implementation evidence.
-- Identify implemented behaviors/modules with no clear requirement source when significant.
-- Highlight architectural drift, obsolete assumptions, inconsistent interfaces, and missing constraints.
-- Prefer updating the design to describe both the current state and the recommended target state when the user requests improvement.
-
-## Default document behavior
-
-When no user/company template is supplied, use the built-in standardized DOCX template for Word output and `templates/default-outline.md` as the content guide.
-
-Do **not** create standalone chapters for concurrency/tasking, state machines, performance/real-time behavior, or build/deployment unless explicitly requested or clearly necessary. Integrate those topics into Overall Architecture, Module Design, Data Design, Interface Design, or Risks as appropriate.
-
-Security is conditional: include it when the system has authentication, authorization, sensitive data, network exposure, update mechanisms, safety/security requirements, or other meaningful security concerns. Otherwise keep it concise or remove the optional section from the final document.
-
-For the built-in DOCX template:
-
-- Replace document-control placeholders such as project, document ID, version, author, reviewer, approver, date, scope, and department when values are known.
-- Do not guess unknown administrative metadata; leave a clear placeholder or mark it pending.
-- Replace instructional placeholder text with project-specific content.
-- Duplicate module subsections/tables as needed and remove unused sample rows.
-- Remove optional sections that are not relevant rather than filling them with generic prose.
-- Insert architecture/flow diagrams in the corresponding sections when available.
-- Update the table of contents and page fields when the available Word/DOCX tool supports field updates; otherwise preserve the fields for Word to update on open.
-
-## Writing rules
-
-- Write at high-level design granularity, not detailed implementation-document granularity.
-- Prefer concrete responsibilities and relationships over generic software-engineering prose.
-- Keep modules cohesive and dependencies explicit.
-- Prefer stable abstractions and one-way dependency direction.
-- Explain important tradeoffs and rejected alternatives when they affect maintainability, reliability, cost, performance, portability, or schedule.
-- Define an abbreviation with its English full name and local-language meaning on first use when appropriate.
-- Never claim that a proposed design already exists in code.
-- Never fabricate exact priorities, buffer sizes, timeouts, protocols, field widths, database schemas, file names, or resource limits unless supported by evidence or explicitly proposed as a design choice.
-- Avoid textbook chapters that add no project-specific value.
-- Do not append implementation artifacts such as project folders, `.c/.cpp/.h` skeletons, build-system scaffolding, or generated application code to the HLD deliverable.
-
-## Reference files
-
-Read only the references needed for the current task:
-
-- `references/architecture-analysis.md` — architecture extraction and design checks
-- `references/document-rules.md` — content quality and evidence rules
-- `references/platform-profiles.md` — platform-specific analysis hints
-- `references/diagram-guide.md` — choosing useful diagrams
-- `references/tool-integration.md` — optional CodeGraph, PlantUML, DOCX, Pandoc, and fallback behavior
-- `references/docx-template.md` — built-in Word template usage and placeholder rules
+- Important claims have locatable evidence or are explicitly proposals/assumptions.
+- Major requirements have architectural owners; critical interfaces and data have ownership and fault behavior.
+- Text, tables, diagrams, and identifiers agree; updates do not silently rewrite approved decisions.
+- Use the requested language; expand abbreviations with English full names and local-language meanings on first use where appropriate.
+- Required sections are filled, irrelevant samples removed, numbering consistent, and unknown metadata visible.
+- For Word: reopen the file, check fields/images/tables, render and inspect pages when a rendering tool is available. Report unverified layout or pending fields/figures precisely; do not claim checks that were not run.
+- Deliver only requested outputs and necessary editable diagram sources. Distinguish a completed document, a draft awaiting figures, and a review report. Do not continue into implementation.

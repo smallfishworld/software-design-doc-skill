@@ -1,22 +1,24 @@
 # Optional Tool Integration and Fallback Rules
 
-The skill must remain usable with only Claude Code and local project files. External tools are optional accelerators, not hard dependencies, but their availability must be discovered at the beginning of each skill run so installed tools are actually used.
+The skill works with a capable coding agent and accessible requirements/project files. Optional integrations accelerate analysis or enable a requested file format; they are not prerequisites for a text review. No specific agent CLI is required.
 
 ## Startup capability discovery
 
-Before architecture analysis or drafting, run the lightweight capability check described in `SKILL.md`. Prefer:
+Resolve the task first, then check only the capabilities it needs. Run the bundled script using its absolute path, regardless of the project working directory:
 
 ```bash
-python3 scripts/check_environment.py
+python3 /path/to/software-design-doc/scripts/check_environment.py --scope diagrams
+python3 /path/to/software-design-doc/scripts/check_environment.py --scope docx --scope diagrams --json
+python3 /path/to/software-design-doc/scripts/check_environment.py --scope diagrams --plantuml-jar "/path/to/plantuml.jar"
 ```
 
-The check verifies command/module usability only. Do not render a test diagram or create temporary output solely for environment detection.
+No arguments checks all optional local integrations. `PLANTUML_JAR` is also supported. The script requires Python 3.9+ and the standard library; it reports missing capabilities without failing the core workflow. Exit status zero means the diagnostic completed, not that all tools are installed. The `available` property means a command/import probe succeeded, not that a real render succeeded.
 
-Successful checks should normally remain quiet. Mention a missing tool only when it changes the requested output or causes a fallback.
+Do not generate test diagrams just for discovery. Verify actual outputs later. Inspect agent-exposed document and repository tools separately; the script cannot enumerate them. Text-only reviews need no renderer probes. Keep successful checks quiet and mention limitations only when they affect deliverables.
 
 ## Code intelligence / CodeGraph
 
-When CodeGraph or an equivalent repository-aware code analysis tool is available, use it for:
+When CodeGraph or an equivalent repository-aware tool is available and its index matches the selected repository/revision, use it for:
 
 - module and dependency discovery;
 - call relationships;
@@ -27,88 +29,11 @@ When CodeGraph or an equivalent repository-aware code analysis tool is available
 
 Do not require CodeGraph for requirements-first/greenfield design. When no code exists, it provides no value and should be skipped.
 
-If CodeGraph is unavailable, inspect repository files directly: build definitions, source directories, public headers/APIs, schemas, configuration, tests, and entry points.
+Validate important tool-derived claims against source locations. A stale or partial index does not establish that a feature is absent. If CodeGraph is unavailable or unsuitable, inspect repository files directly: build definitions, source directories, public headers/APIs, schemas, configuration, tests, and entry points.
 
 ## Diagram workflow
 
-First identify the semantic type of the diagram.
-
-### UML / software architecture diagrams
-
-Prefer PlantUML for UML (Unified Modeling Language) and software-architecture-oriented diagrams, including component, class, sequence, state, activity, deployment, and similar engineering diagrams.
-
-If PlantUML fails or is unavailable, convert the intended diagram to an appropriate Mermaid representation and try Mermaid CLI.
-
-### General diagrams
-
-Prefer Mermaid for:
-
-- flowcharts;
-- tree/hierarchy diagrams;
-- functional decomposition diagrams;
-- mind maps;
-- general relationship diagrams;
-- other non-UML visual structures that Mermaid expresses naturally.
-
-When Mermaid CLI is detected successfully with:
-
-```bash
-mmdc --version
-```
-
-generate the `.mmd` source and invoke `mmdc` directly. Prefer SVG for document-quality vector output; use PNG when required by the DOCX toolchain.
-
-Example:
-
-```bash
-mmdc -i architecture.mmd -o architecture.svg
-```
-
-## Required fallback behavior
-
-Use this exact fallback behavior:
-
-```text
-Identify diagram type
-    |
-    +-- UML / software architecture
-    |      -> Prefer PlantUML
-    |
-    +-- Flowchart / tree / functional decomposition / general relationship
-           -> Prefer Mermaid
-
-PlantUML fails
-    -> Try Mermaid
-
-Mermaid cannot render in the current Linux environment
-    -> Preserve the .mmd Mermaid source
-    -> Tell the user to render it in a Windows environment with mmdc
-    -> Produce SVG or PNG there
-    -> Insert the rendered SVG/PNG into the final DOCX
-```
-
-Do not use Text/ASCII diagrams as finished diagrams in the HLD. Raw Mermaid source is also not a finished diagram for the final Word deliverable.
-
-If the current Linux environment cannot render Mermaid but the `.mmd` source can be generated, preserve that source as the handoff artifact. The final DOCX should receive the rendered SVG/PNG after rendering succeeds on Windows or another suitable environment.
-
-### PlantUML commands
-
-Typical command installation:
-
-```bash
-plantuml -version
-plantuml architecture.puml
-```
-
-Typical local JAR installation:
-
-```bash
-java -version
-java -jar plantuml.jar -version
-java -jar plantuml.jar architecture.puml
-```
-
-Prefer storing `.puml` source next to generated images when practical.
+Follow [diagram-guide.md](diagram-guide.md), the authoritative diagram policy. It defines semantic tool selection, actual rendering checks, PlantUML-to-Mermaid fallback, and Windows handoff when Mermaid cannot render locally. Keep the policy there rather than maintaining a second fallback chain here.
 
 ## Word / DOCX output
 
@@ -170,14 +95,6 @@ The skill itself requires no network calls. For intranet use:
 
 Never store API keys, tokens, passwords, or company secrets in the skill repository.
 
-## Tool availability principle
+## Delivery limitations
 
-Always degrade gracefully without substituting informal ASCII drawings for formal design diagrams:
-
-- no code -> requirements-first design;
-- code but no CodeGraph -> inspect files directly;
-- PlantUML unavailable/fails for a UML or architecture diagram -> Mermaid;
-- Mermaid CLI available -> render directly with `mmdc`;
-- Mermaid cannot render on current Linux -> preserve `.mmd`, render with `mmdc` on Windows, then insert SVG/PNG into DOCX;
-- DOCX tool available but no company template -> use `templates/default-software-design-template.docx`;
-- no DOCX tool -> produce structured Markdown using `templates/default-outline.md`.
+Continue useful analysis when an optional capability is unavailable. Distinguish a text review, a complete Markdown document, a Word draft awaiting figures, and a validated final DOCX. Record only relevant limitations and the concrete completion steps; never claim an unavailable conversion, render, or field refresh succeeded.

@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""Lightweight capability check for software-design-doc-skill.
+"""Probe optional local commands/imports, without rendering or creating artifacts.
 
-Only verifies that relevant commands/modules can be invoked. It intentionally
-does not render test diagrams or create test artifacts.
+Python 3.9+; standard library only. A successful probe is not a render test.
+Missing optional tools are reported as data and do not make this command fail.
 """
-
 from __future__ import annotations
 
-import importlib.util
+import argparse
+import json
+import os
+from pathlib import Path
 import shutil
 import subprocess
-from dataclasses import dataclass
+import sys
+from dataclasses import asdict, dataclass
 
 
 @dataclass
@@ -20,69 +23,89 @@ class Check:
     detail: str
 
 
-def command_version(name: str, args: list[str]) -> Check:
-    path = shutil.which(name)
-    if not path:
-        return Check(name, False, "not found in PATH")
+def probe(name: str, command: list[str], timeout: float = 5) -> Check:
     try:
         result = subprocess.run(
-            [path, *args],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            timeout=5,
-            check=False,
+            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, errors="replace", timeout=timeout, check=False,
         )
         lines = (result.stdout or "").strip().splitlines()
-        detail = lines[0] if lines else path
-        if result.returncode == 0:
-            return Check(name, True, detail)
-        return Check(name, False, f"command returned {result.returncode}: {detail}")
-    except Exception as exc:
-        return Check(name, False, f"command check failed: {exc}")
+        detail = lines[0][:300] if lines else "command completed"
+        if result.returncode != 0:
+            return Check(name, False, f"exit {result.returncode}: {detail}")
+        return Check(name, True, detail)
+    except subprocess.TimeoutExpired:
+        return Check(name, False, f"probe timed out after {timeout:g}s")
+    except OSError as exc:
+        return Check(name, False, f"cannot execute: {exc}")
 
 
-def python_module(name: str, display: str | None = None) -> Check:
-    available = importlib.util.find_spec(name) is not None
-    return Check(
-        display or name,
-        available,
-        "Python module available" if available else "Python module not installed",
-    )
+def command_version(name: str, args: list[str]) -> Check:
+    path = shutil.which(name)
+    return probe(name, [path, *args]) if path else Check(name, False, "not found in PATH")
 
 
-def main() -> int:
-    checks = [
-        command_version("claude", ["--version"]),
-        command_version("plantuml", ["-version"]),
-        command_version("mmdc", ["--version"]),
-        command_version("java", ["-version"]),
-        command_version("pandoc", ["--version"]),
-        command_version("dot", ["-V"]),
-        python_module("docx", "python-docx"),
-    ]
+def python_docx() -> Check:
+    # Finding a module spec alone does not catch broken installs or import errors.
+    return probe("python-docx", [sys.executable, "-c",
+        "import docx; assert callable(docx.Document); print('python-docx import succeeded')"])
 
-    print("Software Design Document Skill - Capability Check")
-    print("=" * 64)
-    for check in checks:
-        state = "OK" if check.available else "--"
-        print(f"[{state:>2}] {check.name:<16} {check.detail}")
 
-    print("\nDiagram fallback:")
-    plantuml = next(c for c in checks if c.name == "plantuml")
-    mermaid = next(c for c in checks if c.name == "mmdc")
-    if plantuml.available:
-        print("- PlantUML available: prefer PlantUML for HLD diagrams.")
-    elif mermaid.available:
-        print("- PlantUML unavailable; Mermaid renderer available: use Mermaid.")
+def plantuml_jar(path: str) -> Check:
+    jar = Path(path).expanduser().resolve()
+    if not jar.is_file():
+        return Check("plantuml-jar", False, f"JAR not found: {jar}")
+    java = shutil.which("java")
+    if not java:
+        return Check("plantuml-jar", False, "java not found in PATH")
+    return probe("plantuml-jar", [java, "-jar", str(jar), "-version"])
+
+
+def collect_checks(scopes: set[str], jar: str | None = None) -> list[Check]:
+    checks = []
+    if "diagrams" in scopes:
+        checks.extend([
+            command_version("plantuml", ["-version"]),
+            command_version("mmdc", ["--version"]),
+            command_version("java", ["-version"]),
+            command_version("dot", ["-V"]),
+        ])
+        if jar:
+            checks.append(plantuml_jar(jar))
+    if "docx" in scopes:
+        checks.extend([python_docx(), command_version("pandoc", ["--version"]),
+                       command_version("soffice", ["--version"])])
+    return checks
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--scope", choices=["diagrams", "docx"], action="append",
+                        help="Repeat to select capabilities; omitted means all")
+    parser.add_argument("--plantuml-jar", default=os.environ.get("PLANTUML_JAR"),
+                        help="Known local JAR path (or PLANTUML_JAR environment variable)")
+    parser.add_argument("--json", action="store_true", help="Machine-readable probe results")
+    args = parser.parse_args(argv)
+    scopes = set(args.scope or ["diagrams", "docx"])
+    checks = collect_checks(scopes, args.plantuml_jar)
+    notes = ["Discovery/import checks only; actual rendering and conversion remain unverified.",
+             "Agent-exposed document tools and CodeGraph/MCP must be inspected separately when relevant."]
+    if "diagrams" in scopes:
+        notes.extend([
+            "UML/software architecture: PlantUML first (command or configured JAR); on failure try Mermaid.",
+            "Flowcharts/trees/functional decomposition/general relationships: Mermaid first.",
+            "If Mermaid cannot render locally, preserve .mmd and provide Windows mmdc commands; no ASCII replacement.",
+            "Insert verified images before claiming a final illustrated Word document.",
+        ])
+    report = {"checks": [asdict(check) for check in checks], "notes": notes}
+    if args.json:
+        print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
-        print("- No PlantUML/Mermaid renderer detected: use text/ASCII descriptions.")
-
-    print("\nNotes:")
-    print("- This is a lightweight command/module check; no test diagram is rendered.")
-    print("- A PlantUML JAR installation may be usable through Java even if the plantuml command is absent.")
-    print("- CodeGraph/MCP availability is agent-specific and must be checked from the current tool context when code exists.")
-    print("- Missing optional tools must not block the core HLD workflow; use the documented fallback chain.")
+        print("Software Design Document - Local Capability Discovery")
+        for check in checks:
+            print(f"[{'OK' if check.available else '--'}] {check.name:<16} {check.detail}")
+        for note in notes:
+            print(f"- {note}")
     return 0
 
 

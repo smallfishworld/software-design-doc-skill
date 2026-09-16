@@ -2,20 +2,25 @@
 
 ## Source precedence
 
-When sources conflict, do not silently choose one. Report the conflict and apply this practical precedence unless the user specifies otherwise:
+Resolve conflicts by the kind of claim, not a single ranking across unrelated sources:
 
-1. Explicit user instruction for the current task
-2. Organization/company template or mandatory standard
-3. Approved requirement/specification documents
-4. Current source code/configuration/build artifacts for describing existing implementation
-5. Existing design documents
-6. Inference or proposed design
+- **Task scope and format:** explicit current user instructions, then required company/project conventions, then built-in defaults.
+- **Intended behavior:** approved requirements and confirmed user decisions; identify the version and report conflicts.
+- **Existing behavior:** active source/configuration for the selected revision. A template or requirement does not prove implementation behavior.
+- **Historical intent:** existing design documents; compare with requirements and code rather than silently treating them as current.
+- **Proposed behavior:** design decisions and assumptions, visibly separated from facts.
 
-Requirement truth and implementation truth are different. In hybrid mode, preserve both when they disagree.
+If sources disagree, record both claims, their locators/versions, and the impact. Ask for resolution only when needed to choose a consequential direction; continue independent work.
 
 ## Evidence discipline
 
-Before drafting, maintain an internal ledger of important claims. Classify them as requirement, code, existing document, design proposal, assumption, or unresolved item.
+Before drafting, maintain a lightweight ledger for consequential claims, not every sentence:
+
+| Claim / decision | Class | Source locator / rationale | Status / consequence |
+| --- | --- | --- | --- |
+| Summarized statement | REQ / CODE / DOC / DESIGN / ASSUMPTION / TODO | Requirement ID and section; code path, symbol, revision; or decision rationale | Confirmed / proposed / unresolved, with impact |
+
+Record code paths and symbols (line numbers when useful), document sections/pages, and requirement versions when known. For partial inspection, record what was examined and what remains unseen. Do not claim an exhaustive review from a sample. Distinguish lack of evidence from confirmed absence.
 
 A final statement should be one of:
 
@@ -34,7 +39,7 @@ For requirements-first designs, map major requirements to architectural elements
 | --- | --- | --- | --- |
 | R1 | Module/Subsystem A | ... | ... |
 
-The table can remain internal unless the user asks for traceability in the final document.
+Keep the working table internal if it adds no reader value, but expose uncovered requirements, conflicts, and consequential assumptions in the final document or review. For hybrid work, add observed implementation and gap status.
 
 Check that every high-priority functional requirement has an owner in the architecture and that important non-functional requirements affect at least one concrete design decision.
 
@@ -97,3 +102,21 @@ Before completing the document, verify:
 - Assumptions and unresolved items are visible.
 - Diagrams and prose do not contradict each other.
 - The document is sufficiently concrete to guide implementation without becoming detailed design.
+
+## Review-only output
+
+Return an impact-ordered review rather than a replacement document. For each finding include:
+
+| Field | Required content |
+| --- | --- |
+| Impact | High: breaks a core requirement/contract or risks loss; Medium: concrete maintainability/reliability ambiguity; Low: limited consistency/readability issue |
+| Location | Document section, diagram/table identifier, or source path/symbol |
+| Evidence | Conflicting claims, missing contract, or observed behavior; identify the source |
+| Consequence | What fails or becomes ambiguous, and under which condition |
+| Correction | A specific design change or decision to resolve |
+
+Separate confirmed defects, open questions, and optional improvements. Do not assign severity based solely on a preferred style. State inspected inputs/revisions and material coverage gaps, and explain any check that could not run. If no significant findings are supported, say so and retain the limitations.
+
+## Incremental updates
+
+Read the existing artifact and identify affected requirements/modules before editing. Update dependent figures, interface tables, terminology, cross-references, and the revision record when appropriate. Do not mark a document approved or invent reviewers/dates. Preserve unrelated approved sections. Briefly report substantive changes and remaining decisions.

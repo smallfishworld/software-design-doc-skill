@@ -46,7 +46,7 @@ Document metadata placeholders include:
 - `{{SCOPE}}` — applicability/scope
 - `{{DEPT}}` — department/team
 
-Content tables contain sample placeholders such as `{{MODULE}}`, `{{RESP}}`, `{{DATA}}`, `{{IFACE}}`, and `{{DESC}}`. Replace them with real project content, duplicate rows/sections when required, and delete unused examples.
+Content tables contain sample placeholders such as `{{MODULE}}`, `{{RESP}}`, `{{DATA}}`, `{{IFACE}}`, `{{CONTRACT}}`, and `{{DESC}}`. Replace them with real project content, duplicate rows/sections when required, and delete unused examples.
 
 Unknown administrative values must not be invented. Keep a clear placeholder or mark the value as pending when the user has not supplied it.
 
@@ -80,3 +80,22 @@ Use a meaningful output filename when the user does not specify one, for example
 or for Chinese projects:
 
 `<项目名称>软件概要设计说明书_V1.0.docx`
+
+## Validation before delivery
+
+Reopen the edited DOCX with a document reader and verify that the ZIP package and XML parts are readable. Inspect body text, tables, headers, and footers for unreplaced instructional placeholders; unknown administrative metadata may remain explicitly pending. Preserve editable TOC/page fields rather than fabricating page numbers.
+
+Ensure the rendering environment has Chinese fonts (the template requests Noto Sans CJK SC; use a suitable local replacement if unavailable). Render to pages with an available local Word/LibreOffice or document renderer and visually inspect every page for clipping, broken tables, missing glyphs, unreadable diagrams, and stranded headings. A successful file save alone does not validate layout. State clearly if visual verification or field refresh could not run.
+
+Direct `python-docx` image insertion uses PNG; preserve SVG separately unless the selected editing pipeline has verified SVG support. See [diagram-guide.md](diagram-guide.md).
+
+## Maintainer rebuild
+
+The template source is [build_default_template.py](../scripts/build_default_template.py). Python 3.9+ and `python-docx` are needed **only to rebuild**, not to use the distributed template. The script preserves A4 sizing, Chinese headings, document-control placeholders, tables, headers/footers, and real TOC/page fields.
+
+```bash
+python3 scripts/build_default_template.py
+python3 -m unittest discover -s tests -v
+```
+
+Run from the repository root. For a preview, use `--output /path/to/preview.docx`. After a layout change, render and visually inspect the rebuilt template before committing it. Keep the 13 default chapter meanings aligned with `default-outline.md`; unused optional chapters must be removed and renumbered in the final project document. Commit DOCX as binary through Git (or a base64-aware API); do not pass it through a UTF-8 text update endpoint.

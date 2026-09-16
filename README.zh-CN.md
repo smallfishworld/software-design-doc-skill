@@ -229,8 +229,11 @@ software-design-doc-skill/
 │   └── docx-template.md
 ├── examples/
 │   └── example-request.md
-└── scripts/
-    └── check_environment.py
+├── scripts/
+│   ├── check_environment.py
+│   └── build_default_template.py
+└── tests/
+    └── test_skill.py
 ```
 
 ## 设计原则
@@ -250,9 +253,28 @@ software-design-doc-skill/
 
 Skill 默认强调：高内聚、低耦合、依赖关系清晰、模块职责明确、接口简单稳定，并尽量让文档反映真实项目，而不是套用教科书模板。
 
+## 评审与交付行为
+
+- 先区分需求驱动、代码驱动或混合输入，再选择生成、增量更新或仅评审。
+- 仅评审输出按影响排序的问题，包含位置、证据、影响、修正建议及覆盖范围；不强制生成 Word。
+- 工具检查按交付物选择范围，脚本路径相对于 Skill 安装位置，不依赖当前项目目录。
+- UML / 软件架构优先 PlantUML；流程图、树形图、功能分解和通用关系图优先 Mermaid。规则统一维护在 [绘图指南](references/diagram-guide.md)。
+- 版本检查成功不代表实际渲染成功。Linux 无法渲染 Mermaid 时保留 `.mmd` 和 Windows 命令；缺少图的 Word 标为待补图草稿。
+- Word 模板可从脚本重建，交付前应检查文件完整性和实际页面排版。
+
+可按范围检查环境（脚本需要 Python 3.9+，只使用标准库）：
+
+```bash
+python3 scripts/check_environment.py --scope diagrams --plantuml-jar "/path/to/plantuml.jar"
+python3 scripts/check_environment.py --scope docx --scope diagrams --json
+python3 -m unittest discover -s tests -v
+```
+
+测试只依赖标准库；模板重建另需 `python-docx`。测试覆盖命令缺失、失败、超时、JAR 路径、DOCX 完整性、目录字段和本地引用。模板重建后还需实际渲染并检查页面。
+
 ## 当前状态
 
-当前为初始版本，欢迎使用真实项目验证，尤其欢迎以下场景的反馈：
+欢迎使用真实项目验证，尤其欢迎以下场景的反馈：
 
 - 只有需求、没有代码的从 0 概要设计
 - 公司软件概要设计 Word 模板适配

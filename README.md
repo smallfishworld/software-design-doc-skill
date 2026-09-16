@@ -207,8 +207,11 @@ software-design-doc-skill/
 │   └── docx-template.md
 ├── examples/
 │   └── example-request.md
-└── scripts/
-    └── check_environment.py
+├── scripts/
+│   ├── check_environment.py
+│   └── build_default_template.py
+└── tests/
+    └── test_skill.py
 ```
 
 ## Design philosophy
@@ -219,6 +222,25 @@ For greenfield work, the requirements are the factual baseline and the architect
 
 The skill favors high cohesion, low coupling, explicit dependencies, clear ownership, simple interfaces, and architecture that reflects the actual project rather than a textbook template.
 
+## Review and delivery behavior
+
+- Select requirements-first, code-first, or hybrid inputs independently of creation, incremental updates, or review-only output.
+- Reviews report impact-ordered findings with locations, evidence, consequences, corrections, and coverage; they do not force Word generation.
+- Probe only relevant capabilities using paths relative to the installed skill, not the current project directory.
+- Prefer PlantUML for UML/software architecture and Mermaid for general flows, trees, functional decomposition, and relationships. [Diagram Guide](references/diagram-guide.md) owns the full policy.
+- Version checks do not prove rendering works. If Mermaid cannot render on Linux, retain `.mmd` and Windows commands; label a Word file missing figures as a draft.
+- The Word template has a rebuild script. Check package integrity and actual page layout before delivery.
+
+Scoped diagnostics (Python 3.9+, standard library only):
+
+```bash
+python3 scripts/check_environment.py --scope diagrams --plantuml-jar "/path/to/plantuml.jar"
+python3 scripts/check_environment.py --scope docx --scope diagrams --json
+python3 -m unittest discover -s tests -v
+```
+
+Tests need only the standard library; rebuilding the template additionally needs `python-docx`. Tests cover missing/failing/timed-out tools, JAR paths, DOCX integrity, fields, and local links. Template changes also require real rendering and page inspection.
+
 ## Status
 
-Initial version. Real-project feedback is welcome, especially for requirements-first design, company HLD templates, embedded/RTOS projects, backend services, desktop software, and Word document workflows.
+Real-project feedback is welcome, especially for requirements-first design, company HLD templates, embedded/RTOS projects, backend services, desktop software, and Word document workflows.

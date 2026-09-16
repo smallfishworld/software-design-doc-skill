@@ -66,7 +66,7 @@ Review the current architecture. Focus on module boundaries, dependency directio
 ```text
 /software-design-doc
 
-Analyze this RTOS project and generate the HLD. Integrate task/queue/semaphore/timer analysis into the relevant architecture and module sections; do not create a standalone task-design chapter unless necessary.
+Analyze this RTOS project and generate the HLD. Integrate task/queue/semaphore/timer analysis into the relevant architecture and module sections; do not create a standalone task-design chapter unless explicitly requested.
 ```
 
 ## 6. Backend project
@@ -76,3 +76,21 @@ Analyze this RTOS project and generate the HLD. Integrate task/queue/semaphore/t
 
 Generate an HLD for this backend service from requirements and current code. Pay special attention to API boundaries, database ownership, asynchronous jobs, retries/timeouts, and external service failure handling.
 ```
+
+## 7. Incremental update with a company template
+
+```text
+/software-design-doc
+Update only the storage and fault-recovery design in the existing Word HLD for the revised retention requirement. Preserve the company chapter structure and approved architecture. Update affected diagrams and cross-references.
+```
+
+Expected behavior: inspect the current artifact, isolate the requirement's impact, preserve unrelated sections, expose unresolved migration decisions, and verify the edited Word pages.
+
+## 8. Renderer unavailable on Linux
+
+```text
+/software-design-doc
+Produce a Word HLD including an architecture diagram and a functional decomposition tree. PlantUML is unavailable. mmdc --version works, but actual rendering fails because Chromium is unavailable; Windows rendering can be completed later.
+```
+
+Expected behavior: choose tools by semantics, try the documented fallback, preserve Mermaid sources with figure destinations and Windows commands, complete useful content, and identify the Word output as a draft awaiting figures. A successful version check must not be reported as a successful render.

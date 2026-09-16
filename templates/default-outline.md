@@ -1,6 +1,6 @@
 # Default Software High-Level Design Outline
 
-Use this outline only when the user or organization does not provide a required template. Remove sections that are irrelevant; add sections only when they materially improve the design.
+Use this outline only when the user or organization does not provide a required template. Remove irrelevant optional sections and renumber consistently. Add standalone task/concurrency, state-machine, performance/real-time, or build/deployment/upgrade chapters only when the user or required company template explicitly requests them. Integrate relevant content elsewhere by default.
 
 # 1. Introduction
 
