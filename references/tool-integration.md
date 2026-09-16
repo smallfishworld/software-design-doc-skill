@@ -1,6 +1,18 @@
 # Optional Tool Integration and Fallback Rules
 
-The skill must remain usable with only Claude Code and local project files. External tools are optional accelerators, not hard dependencies.
+The skill must remain usable with only Claude Code and local project files. External tools are optional accelerators, not hard dependencies, but their availability must be discovered at the beginning of each skill run so installed tools are actually used.
+
+## Startup capability discovery
+
+Before architecture analysis or drafting, run the lightweight capability check described in `SKILL.md`. Prefer:
+
+```bash
+python3 scripts/check_environment.py
+```
+
+The check verifies command/module usability only. Do not render a test diagram or create temporary output solely for environment detection.
+
+Successful checks should normally remain quiet. Mention a missing tool only when it changes the requested output or causes a fallback.
 
 ## Code intelligence / CodeGraph
 
@@ -17,19 +29,46 @@ Do not require CodeGraph for requirements-first/greenfield design. When no code 
 
 If CodeGraph is unavailable, inspect repository files directly: build definitions, source directories, public headers/APIs, schemas, configuration, tests, and entry points.
 
-## PlantUML
+## Diagram rendering: PlantUML > Mermaid > Text
 
-When PlantUML is available, use it for versionable architecture/UML diagrams.
+Use this fallback order for HLD diagrams:
 
-Typical local command:
+1. **PlantUML** when its command/JAR invocation is usable.
+2. **Mermaid** when PlantUML is unavailable and a Mermaid renderer such as `mmdc` is usable.
+3. **Text/ASCII plus structured description** when neither renderer is usable.
+
+### PlantUML
+
+PlantUML is the preferred diagram tool for versionable architecture/UML diagrams. If it is available and a diagram materially improves the HLD, actually use it rather than silently choosing another representation.
+
+Typical command installation:
 
 ```bash
+plantuml -version
+plantuml architecture.puml
+```
+
+Typical local JAR installation:
+
+```bash
+java -version
+java -jar plantuml.jar -version
 java -jar plantuml.jar architecture.puml
 ```
 
-Prefer storing `.puml` source next to generated images.
+Prefer storing `.puml` source next to generated images when practical.
 
-If PlantUML is unavailable, use Mermaid if the target environment supports it, otherwise provide text/ASCII diagrams and structured descriptions.
+### Mermaid fallback
+
+If PlantUML is unavailable, check whether Mermaid CLI/rendering is usable:
+
+```bash
+mmdc --version
+```
+
+Use Mermaid only when the current environment can render it into a format usable by the requested deliverable.
+
+If Mermaid source can be produced but cannot be rendered for a final DOCX, do not insert raw Mermaid source and call it a finished diagram. Fall back to structured text/tables or another renderable mechanism.
 
 ## Word / DOCX output
 
@@ -86,7 +125,7 @@ The skill itself requires no network calls. For intranet use:
 - clone/download the repository outside the isolated network;
 - copy the skill directory into `~/.claude/skills/software-design-doc/` or the project's `.claude/skills/software-design-doc/`;
 - the built-in DOCX template is included in the repository and needs no online download;
-- install optional PlantUML, Python libraries, Pandoc, or MCP servers from approved offline packages if needed;
+- install optional PlantUML, Python libraries, Pandoc, Mermaid CLI, or MCP servers from approved offline packages if needed;
 - configure Claude/model API base URL and key separately from this skill according to the organization's gateway/API setup.
 
 Never store API keys, tokens, passwords, or company secrets in the skill repository.
@@ -97,6 +136,7 @@ Always degrade gracefully:
 
 - no code → requirements-first design;
 - code but no CodeGraph → inspect files directly;
-- no PlantUML → Mermaid/text diagram;
+- PlantUML unavailable → use a renderable Mermaid environment;
+- PlantUML and Mermaid unavailable → text/ASCII plus structured description;
 - DOCX tool available but no company template → use `templates/default-software-design-template.docx`;
 - no DOCX tool → produce structured Markdown using `templates/default-outline.md`.
