@@ -29,17 +29,69 @@ Do not require CodeGraph for requirements-first/greenfield design. When no code 
 
 If CodeGraph is unavailable, inspect repository files directly: build definitions, source directories, public headers/APIs, schemas, configuration, tests, and entry points.
 
-## Diagram rendering: PlantUML > Mermaid > Text
+## Diagram workflow
 
-Use this fallback order for HLD diagrams:
+First identify the semantic type of the diagram.
 
-1. **PlantUML** when its command/JAR invocation is usable.
-2. **Mermaid** when PlantUML is unavailable and a Mermaid renderer such as `mmdc` is usable.
-3. **Text/ASCII plus structured description** when neither renderer is usable.
+### UML / software architecture diagrams
 
-### PlantUML
+Prefer PlantUML for UML (Unified Modeling Language) and software-architecture-oriented diagrams, including component, class, sequence, state, activity, deployment, and similar engineering diagrams.
 
-PlantUML is the preferred diagram tool for versionable architecture/UML diagrams. If it is available and a diagram materially improves the HLD, actually use it rather than silently choosing another representation.
+If PlantUML fails or is unavailable, convert the intended diagram to an appropriate Mermaid representation and try Mermaid CLI.
+
+### General diagrams
+
+Prefer Mermaid for:
+
+- flowcharts;
+- tree/hierarchy diagrams;
+- functional decomposition diagrams;
+- mind maps;
+- general relationship diagrams;
+- other non-UML visual structures that Mermaid expresses naturally.
+
+When Mermaid CLI is detected successfully with:
+
+```bash
+mmdc --version
+```
+
+generate the `.mmd` source and invoke `mmdc` directly. Prefer SVG for document-quality vector output; use PNG when required by the DOCX toolchain.
+
+Example:
+
+```bash
+mmdc -i architecture.mmd -o architecture.svg
+```
+
+## Required fallback behavior
+
+Use this exact fallback behavior:
+
+```text
+Identify diagram type
+    |
+    +-- UML / software architecture
+    |      -> Prefer PlantUML
+    |
+    +-- Flowchart / tree / functional decomposition / general relationship
+           -> Prefer Mermaid
+
+PlantUML fails
+    -> Try Mermaid
+
+Mermaid cannot render in the current Linux environment
+    -> Preserve the .mmd Mermaid source
+    -> Tell the user to render it in a Windows environment with mmdc
+    -> Produce SVG or PNG there
+    -> Insert the rendered SVG/PNG into the final DOCX
+```
+
+Do not use Text/ASCII diagrams as finished diagrams in the HLD. Raw Mermaid source is also not a finished diagram for the final Word deliverable.
+
+If the current Linux environment cannot render Mermaid but the `.mmd` source can be generated, preserve that source as the handoff artifact. The final DOCX should receive the rendered SVG/PNG after rendering succeeds on Windows or another suitable environment.
+
+### PlantUML commands
 
 Typical command installation:
 
@@ -57,18 +109,6 @@ java -jar plantuml.jar architecture.puml
 ```
 
 Prefer storing `.puml` source next to generated images when practical.
-
-### Mermaid fallback
-
-If PlantUML is unavailable, check whether Mermaid CLI/rendering is usable:
-
-```bash
-mmdc --version
-```
-
-Use Mermaid only when the current environment can render it into a format usable by the requested deliverable.
-
-If Mermaid source can be produced but cannot be rendered for a final DOCX, do not insert raw Mermaid source and call it a finished diagram. Fall back to structured text/tables or another renderable mechanism.
 
 ## Word / DOCX output
 
@@ -132,11 +172,12 @@ Never store API keys, tokens, passwords, or company secrets in the skill reposit
 
 ## Tool availability principle
 
-Always degrade gracefully:
+Always degrade gracefully without substituting informal ASCII drawings for formal design diagrams:
 
-- no code → requirements-first design;
-- code but no CodeGraph → inspect files directly;
-- PlantUML unavailable → use a renderable Mermaid environment;
-- PlantUML and Mermaid unavailable → text/ASCII plus structured description;
-- DOCX tool available but no company template → use `templates/default-software-design-template.docx`;
-- no DOCX tool → produce structured Markdown using `templates/default-outline.md`.
+- no code -> requirements-first design;
+- code but no CodeGraph -> inspect files directly;
+- PlantUML unavailable/fails for a UML or architecture diagram -> Mermaid;
+- Mermaid CLI available -> render directly with `mmdc`;
+- Mermaid cannot render on current Linux -> preserve `.mmd`, render with `mmdc` on Windows, then insert SVG/PNG into DOCX;
+- DOCX tool available but no company template -> use `templates/default-software-design-template.docx`;
+- no DOCX tool -> produce structured Markdown using `templates/default-outline.md`.
