@@ -66,7 +66,7 @@ Review the current architecture. Focus on module boundaries, dependency directio
 ```text
 /software-design-doc
 
-Analyze this RTOS project and generate the HLD. Integrate task/queue/semaphore/timer analysis into the relevant architecture and module sections; do not create a standalone task-design chapter unless explicitly requested.
+Analyze this RTOS project and generate the HLD. Evaluate task/queue/semaphore/timer behavior using the conditional-chapter rule: keep a standalone concurrency/tasking chapter if the execution model is system-wide, integrate it into the owning modules if local, and delete the candidate chapter if irrelevant.
 ```
 
 ## 6. Backend project

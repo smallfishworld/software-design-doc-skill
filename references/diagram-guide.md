@@ -9,7 +9,7 @@ This file owns tool selection, rendering, source/SVG/PNG assets, and fallback ru
 | UML / architecture: context, component, class, sequence, state, activity, deployment | PlantUML | Boundaries or interactions need a modeled view |
 | General flowchart, data pipeline, tree, functional decomposition, mind map, relationship | Mermaid | Flow or hierarchy is clearer visually |
 
-Distinguish a UML activity model from a general flowchart by its semantics, not merely by the presence of arrows. A simple sequence within one module usually needs only prose. Use state diagrams only when explicit states govern behavior; deployment and thread diagrams are conditional architectural views, not default standalone chapters.
+Distinguish a UML activity model from a general flowchart by its semantics, not merely by the presence of arrows. A simple sequence within one module usually needs only prose. Use state diagrams only when explicit states govern behavior; place deployment and thread diagrams in their conditional candidate chapters only when they express a system-wide architectural view, otherwise keep them with the owning section.
 
 For greenfield work, label proposed/optional elements. For existing systems, derive relationships from active code/configuration. Mark a simplified diagram as a logical view and distinguish observed architecture from a recommended target.
 

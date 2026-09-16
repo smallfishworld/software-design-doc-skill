@@ -64,6 +64,20 @@ It should normally avoid:
 - copied requirement text that adds no design interpretation;
 - generic software-engineering advice unrelated to the project.
 
+## Conditional architecture chapters
+
+When the built-in outline/template is used, concurrency/tasking, state behavior, performance/real-time/resources, and deployment/upgrade/compatibility appear as candidate chapters. Decide each candidate from architectural impact, not document length or the mere presence of related code:
+
+| Decision | Evidence threshold | Placement |
+| --- | --- | --- |
+| Standalone chapter | The concern spans modules or changes system boundaries, execution/deployment topology, shared-resource policy, lifecycle, cross-module contracts, or a major architectural decision | Retain the candidate chapter and remove its candidate marker |
+| Integrated content | The concern matters but is owned by one module, interface, data path, fault path, or risk | Move the content to that section and delete the candidate chapter |
+| Omit | No requirement, implementation evidence, or credible architectural consequence | Delete the candidate chapter; do not add generic filler |
+
+The presence of threads does not by itself justify a concurrency chapter; the presence of an enum does not justify a state chapter; a latency requirement does not justify a performance chapter if it has no design consequence; and the existence of a build script does not justify a deployment chapter. Conversely, a cross-cutting concern should not be buried in one module merely to keep the document short.
+
+Keep HLD focused on responsibilities, ownership, boundaries, policies, budgets, and consequences. Put implementation parameters, exhaustive transition tables, benchmark evidence, build commands, installation steps, and operational procedures in detailed design or specialist documents, referencing them from the HLD when needed.
+
 ## Company template behavior
 
 When a template is supplied:

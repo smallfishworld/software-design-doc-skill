@@ -107,6 +107,18 @@ class PackageTests(unittest.TestCase):
             headers = [z.read(n).decode() for n in z.namelist() if re.fullmatch(r"word/header\d+\.xml", n)]
             self.assertTrue(any("{{PROJECT}}" in h for h in headers))
 
+    def test_template_exposes_conditional_architecture_candidates(self):
+        with ZipFile(ROOT / "templates/default-software-design-template.docx") as z:
+            body = ET.fromstring(z.read("word/document.xml"))
+            text = "".join(t.text or "" for t in body.findall(".//w:t", NS))
+        for heading in (
+            "多任务与并发设计（条件候选）",
+            "状态行为设计（条件候选）",
+            "性能、实时性与资源设计（条件候选）",
+            "部署、升级与兼容性设计（条件候选）",
+        ):
+            self.assertIn(heading, text)
+
     def test_internal_markdown_links_resolve(self):
         for md in ROOT.rglob("*.md"):
             content = re.sub(r"```.*?```", "", md.read_text(), flags=re.S)

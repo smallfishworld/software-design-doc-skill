@@ -108,7 +108,7 @@ For greenfield projects, use these flows to validate that module responsibilitie
 
 ## 8. Concurrency and asynchronous behavior
 
-Analyze when present, but do not force into a standalone chapter.
+Analyze when present. Use the conditional-chapter test in `document-rules.md`: retain a standalone concurrency/tasking chapter only when execution contexts, synchronization, ownership, or scheduling policy span modules or materially shape the system architecture; otherwise integrate the result into the owning module/interface/data/fault section.
 
 Check:
 
@@ -130,7 +130,21 @@ Use an explicit state model when behavior depends strongly on lifecycle states, 
 
 Do not add a state-machine diagram for ordinary conditional logic.
 
-## 10. Fault model
+Retain a standalone state-behavior chapter when one authoritative lifecycle, mode, protocol, workflow, or recovery model coordinates multiple modules or defines an external contract. Otherwise keep the model with its owning module. Leave exhaustive handler actions and complete transition matrices to detailed design unless they are the contract.
+
+## 10. Performance, real-time, and resources
+
+Trace confirmed latency, throughput, deadline, capacity, memory, CPU, storage, and network constraints to concrete architectural decisions. Retain a standalone chapter when budgets or overload policy cross module boundaries or drive partitioning, interfaces, scheduling, buffering, persistence, or deployment. Otherwise record the constraint and response in the affected module/interface/data section.
+
+Distinguish requirements, proposed budgets, observed measurements, and unknowns. Do not invent numbers. Put benchmark procedures and result sets in a performance plan/report.
+
+## 11. Deployment, upgrade, and compatibility
+
+Analyze runtime placement, artifact partitioning, configuration ownership, rollout/rollback, migration, protocol/data compatibility, and availability during upgrade when relevant. Retain a standalone chapter when these concerns change topology, boundaries, contracts, or failure strategy; otherwise integrate them into overall architecture, interfaces, or risks.
+
+Build commands and routine packaging are not HLD content. Include toolchain, ABI, cross-compilation, and generated-artifact constraints only when they materially shape architecture or compatibility.
+
+## 12. Fault model
 
 Identify likely fault domains and expected behavior for:
 
@@ -147,7 +161,7 @@ Identify likely fault domains and expected behavior for:
 
 Determine containment, retry, rollback, fallback, degradation, and observability strategies at architecture level.
 
-## 11. Architecture decision quality
+## 13. Architecture decision quality
 
 For significant decisions, capture:
 
@@ -161,7 +175,7 @@ For significant decisions, capture:
 
 Avoid pretending there is one universally correct architecture.
 
-## 12. Requirement coverage check for greenfield work
+## 14. Requirement coverage check for greenfield work
 
 Before finalizing, ask:
 
@@ -173,7 +187,7 @@ Before finalizing, ask:
 - Are assumptions that could change module boundaries recorded?
 - Are proposed technology choices distinguishable from mandatory constraints?
 
-## 13. Common design smells
+## 15. Common design smells
 
 Flag when supported by evidence:
 

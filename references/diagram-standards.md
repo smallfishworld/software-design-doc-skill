@@ -203,7 +203,7 @@ Use only when execution contexts, IPC (Inter-Process Communication，进程间�
 - Show queue/channel direction, message ownership, shared resources, and synchronization boundaries.
 - Label blocking vs non-blocking interaction when it affects scheduling or deadlock risk.
 - Do not invent priority, period, stack size, queue depth, timeout, or execution budget; use confirmed values or mark proposed/TODO.
-- Integrate this view into the relevant HLD section; it does not require a standalone chapter.
+- Place this view in the conditional concurrency/tasking chapter when it expresses a system-wide execution architecture; otherwise place it with the owning architecture or module section. The diagram alone does not justify a standalone chapter.
 
 ### 9.4 Class or domain diagram
 

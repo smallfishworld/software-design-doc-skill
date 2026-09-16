@@ -158,14 +158,18 @@ When no company template or explicit outline is provided, the skill uses a compa
 5. Module High-Level Design
 6. Data Design
 7. Interface Design
-8. Exception and Fault Handling
-9. Logging and Observability
-10. Security Design (when relevant)
-11. Testability Design
-12. Maintainability and Extensibility
-13. Risks, Constraints, and Open Issues
+8. Concurrency and Tasking Design (conditional candidate)
+9. State Behavior Design (conditional candidate)
+10. Performance, Real-Time, and Resource Design (conditional candidate)
+11. Deployment, Upgrade, and Compatibility Design (conditional candidate)
+12. Exception and Fault Handling
+13. Logging and Observability
+14. Security Design (when relevant)
+15. Testability Design
+16. Maintainability and Extensibility
+17. Risks, Constraints, and Open Issues
 
-Concurrency/tasking, state machines, performance/real-time behavior, and build/deployment are analyzed when relevant but are not standalone chapters by default. They are integrated into the appropriate architecture or module sections unless a user/template explicitly requests separate chapters.
+For each candidate chapter, the skill applies a three-level decision: retain it when the concern has system-wide architectural impact, integrate it into the owning section when the impact is local, and delete it when irrelevant. Routine build commands and deployment procedures remain outside the HLD; architecturally significant toolchain, ABI, cross-compilation, topology, upgrade, and compatibility decisions remain in scope.
 
 ## Optional integrations
 

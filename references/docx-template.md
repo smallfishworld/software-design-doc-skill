@@ -28,7 +28,7 @@ Never overwrite the built-in template. Copy it to the output path first, then ed
 - Standardized tables for terminology, references, modules, data, interfaces, exception handling, and risks.
 - A compact general-purpose HLD structure aligned with `templates/default-outline.md`.
 
-The default standalone chapters intentionally exclude concurrency/tasking, state-machine design, performance/real-time design, and build/deployment. Analyze those topics when relevant, but integrate them into architecture/module/data/interface/risk sections unless a user or company template requests separate chapters.
+The default template includes four conditional candidate chapters: concurrency/tasking, state behavior, performance/real-time/resources, and deployment/upgrade/compatibility. Retain a candidate when it has system-wide architectural impact; integrate locally scoped content into the owning architecture/module/data/interface/fault/risk section; delete it when irrelevant. Remove the candidate marker from retained headings, and repair numbering, the table of contents, and cross-references after deletion. A supplied company template still controls chapter structure.
 
 ## Main placeholders
 
@@ -58,6 +58,7 @@ When generating the final Word document:
 - Replace instructional gray placeholder paragraphs with project-specific content.
 - Duplicate module subsections as needed.
 - Delete optional sections that are irrelevant rather than filling them with generic text.
+- Apply the three-level candidate decision above; do not retain all four chapters mechanically.
 - Insert architecture, data-flow, or sequence diagrams into the matching sections when they add value.
 - Keep diagrams readable on A4 pages and give them descriptive captions when appropriate.
 - Keep source-code-level detail out of the HLD unless it materially explains an architectural decision.

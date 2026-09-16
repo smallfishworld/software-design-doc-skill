@@ -55,7 +55,13 @@ Work at system/module/interface granularity:
 4. Record significant choices, alternatives, consequences, and unresolved validation items.
 5. Check requirement coverage, cohesion, coupling, cycles, shared mutable state, and failure containment.
 
-Analyze concurrency, state, timing, resource budgets, and deployment when they affect the architecture. **Do not create standalone chapters for task/concurrency design, state-machine design, performance/real-time design, or build/deployment/upgrade unless the user or required company template explicitly requests them.** Integrate relevant findings into architecture, module, data, interface, or risk sections.
+Analyze concurrency, state, timing, resource budgets, deployment, upgrade, and compatibility when they affect the architecture. When the built-in outline/template applies, treat **task/concurrency design, state behavior, performance/real-time/resource design, and deployment/upgrade/compatibility design as conditional candidate chapters**:
+
+- keep a candidate as a standalone chapter when the concern changes system-wide boundaries, execution/deployment topology, cross-module contracts, shared-resource policy, lifecycle, or major architectural decisions;
+- integrate a locally scoped concern into the relevant architecture, module, data, interface, fault, or risk section and delete the candidate chapter;
+- delete an irrelevant candidate instead of leaving an empty or generic chapter, then fix numbering, the table of contents, and cross-references.
+
+A required company template still controls chapter structure. Build commands and routine packaging steps are normally outside HLD scope; include toolchain, ABI, cross-compilation, artifact partitioning, or release topology only when they materially constrain the architecture. Keep thread parameters, exhaustive state transitions, performance test data, build commands, and deployment procedures in detailed design or specialist documents unless a high-level decision depends on them.
 
 Never fabricate priorities, buffer sizes, timeouts, protocols, field widths, schema details, filenames, or resource limits. Give evidence, identify a proposed value with rationale, or record the missing decision.
 
