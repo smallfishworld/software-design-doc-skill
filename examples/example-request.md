@@ -94,3 +94,12 @@ Produce a Word HLD including an architecture diagram and a functional decomposit
 ```
 
 Expected behavior: choose tools by semantics, try the documented fallback, preserve Mermaid sources with figure destinations and Windows commands, complete useful content, and identify the Word output as a draft awaiting figures. A successful version check must not be reported as a successful render.
+
+## 9. Markdown and Word diagram assets
+
+```text
+/software-design-doc
+Generate the HLD in Markdown and Word. Keep every PlantUML/Mermaid diagram editable and make the figures remain sharp when zoomed or printed.
+```
+
+Expected behavior: keep `.puml`/`.mmd` as the authoritative editable source, generate matching SVG for relative Markdown references, use verified SVG insertion in DOCX, and fall back to a high-resolution PNG when the selected Word pipeline cannot reliably handle SVG. Do not describe the SVG embedded in Word as semantically editable PlantUML/Mermaid source.

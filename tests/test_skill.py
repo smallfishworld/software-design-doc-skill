@@ -109,7 +109,8 @@ class PackageTests(unittest.TestCase):
 
     def test_internal_markdown_links_resolve(self):
         for md in ROOT.rglob("*.md"):
-            for target in re.findall(r"\]\(([^)]+)\)", md.read_text()):
+            content = re.sub(r"```.*?```", "", md.read_text(), flags=re.S)
+            for target in re.findall(r"\]\(([^)]+)\)", content):
                 if "://" not in target and not target.startswith("#"):
                     self.assertTrue((md.parent / target.split("#")[0]).exists(), f"{md}: {target}")
 

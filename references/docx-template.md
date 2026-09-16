@@ -87,7 +87,7 @@ Reopen the edited DOCX with a document reader and verify that the ZIP package an
 
 Ensure the rendering environment has Chinese fonts (the template requests Noto Sans CJK SC; use a suitable local replacement if unavailable). Render to pages with an available local Word/LibreOffice or document renderer and visually inspect every page for clipping, broken tables, missing glyphs, unreadable diagrams, and stranded headings. A successful file save alone does not validate layout. State clearly if visual verification or field refresh could not run.
 
-Direct `python-docx` image insertion uses PNG; preserve SVG separately unless the selected editing pipeline has verified SVG support. See [diagram-guide.md](diagram-guide.md).
+Prefer SVG diagrams when the selected DOCX editor and target Word/LibreOffice workflow have been verified to insert and render them correctly. Otherwise insert a high-resolution PNG fallback. In both cases preserve the matching `.puml`/`.mmd` source and SVG outside the DOCX. Word's limited SVG editing does not replace source-level PlantUML/Mermaid editing. See [diagram-guide.md](diagram-guide.md).
 
 ## Maintainer rebuild
 

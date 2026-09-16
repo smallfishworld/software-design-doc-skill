@@ -84,11 +84,12 @@ Read [diagram-guide.md](references/diagram-guide.md) when diagrams clarify the d
 
 - UML (Unified Modeling Language，统一建模语言) / software architecture: PlantUML first; on failure/unavailability, try an appropriate Mermaid representation.
 - Flowcharts, trees, functional decomposition, and general relationships: Mermaid first.
+- Treat `.puml`/`.mmd` as the authoritative editable source. Render SVG (Scalable Vector Graphics，可缩放矢量图形) as the preferred presentation asset for Markdown and, when verified compatible, DOCX. Keep a high-resolution PNG (Portable Network Graphics，便携式网络图形) fallback when the document pipeline cannot reliably insert or render SVG.
 - Render actual sources when a local renderer is usable; validate the produced image, not just a version command or exit code.
 - If Mermaid cannot render on the current Linux environment, preserve `.mmd`, provide Windows `mmdc` commands, and identify the target section/caption. Insert rendered images before declaring the Word document final.
 - Never substitute ASCII drawings or raw diagram code for finished Word diagrams. Continue the textual design and deliver a clearly identified draft plus pending rendering steps when necessary.
 
-Keep editable sources alongside final diagrams. Do not send project sources to an external rendering service without authorization.
+In Markdown, reference the SVG by a relative path instead of embedding a generated bitmap when the target renderer supports SVG. In Word, SVG preserves vector quality and may allow limited shape-level editing, but it is not a substitute for editing PlantUML/Mermaid semantics. Keep source, SVG, and fallback PNG together with matching basenames. Do not send project sources to an external rendering service without authorization.
 
 ## 7. Completion checks
 

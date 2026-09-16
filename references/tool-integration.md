@@ -33,7 +33,7 @@ Validate important tool-derived claims against source locations. A stale or part
 
 ## Diagram workflow
 
-Follow [diagram-guide.md](diagram-guide.md), the authoritative diagram policy. It defines semantic tool selection, actual rendering checks, PlantUML-to-Mermaid fallback, and Windows handoff when Mermaid cannot render locally. Keep the policy there rather than maintaining a second fallback chain here.
+Follow [diagram-guide.md](diagram-guide.md), the authoritative diagram policy. It defines semantic tool selection, actual rendering checks, PlantUML-to-Mermaid fallback, source/SVG/PNG asset ownership, Markdown references, DOCX compatibility fallback, and Windows handoff when Mermaid cannot render locally. Keep the policy there rather than maintaining a second fallback chain here.
 
 ## Word / DOCX output
 

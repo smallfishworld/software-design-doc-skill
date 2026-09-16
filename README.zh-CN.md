@@ -259,6 +259,7 @@ Skill 默认强调：高内聚、低耦合、依赖关系清晰、模块职责�
 - 仅评审输出按影响排序的问题，包含位置、证据、影响、修正建议及覆盖范围；不强制生成 Word。
 - 工具检查按交付物选择范围，脚本路径相对于 Skill 安装位置，不依赖当前项目目录。
 - UML / 软件架构优先 PlantUML；流程图、树形图、功能分解和通用关系图优先 Mermaid。规则统一维护在 [绘图指南](references/diagram-guide.md)。
+- `.puml` / `.mmd` 是权威可编辑源；统一优先生成 SVG，Markdown 使用相对路径引用 SVG，DOCX 在验证兼容后插入 SVG，否则使用高分辨率 PNG。Word 中的 SVG 只提供矢量缩放和有限图形编辑，不等于可以编辑 PlantUML/Mermaid 语义。
 - 版本检查成功不代表实际渲染成功。Linux 无法渲染 Mermaid 时保留 `.mmd` 和 Windows 命令；缺少图的 Word 标为待补图草稿。
 - Word 模板可从脚本重建，交付前应检查文件完整性和实际页面排版。
 

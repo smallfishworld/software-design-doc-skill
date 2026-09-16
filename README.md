@@ -228,6 +228,7 @@ The skill favors high cohesion, low coupling, explicit dependencies, clear owner
 - Reviews report impact-ordered findings with locations, evidence, consequences, corrections, and coverage; they do not force Word generation.
 - Probe only relevant capabilities using paths relative to the installed skill, not the current project directory.
 - Prefer PlantUML for UML/software architecture and Mermaid for general flows, trees, functional decomposition, and relationships. [Diagram Guide](references/diagram-guide.md) owns the full policy.
+- Treat `.puml`/`.mmd` as the authoritative editable source. Prefer SVG for relative Markdown references and verified DOCX insertion; use high-resolution PNG as the compatibility fallback. SVG in Word offers vector scaling and limited graphic editing, not PlantUML/Mermaid semantic editing.
 - Version checks do not prove rendering works. If Mermaid cannot render on Linux, retain `.mmd` and Windows commands; label a Word file missing figures as a draft.
 - The Word template has a rebuild script. Check package integrity and actual page layout before delivery.
 
