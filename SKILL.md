@@ -27,7 +27,7 @@ Prefer running `python3 scripts/check_environment.py` when the script is accessi
 Check relevant capabilities without generating test artifacts:
 
 - PlantUML: check whether the `plantuml` command can execute. If the installation uses a local JAR instead, check Java and the configured PlantUML JAR invocation.
-- Mermaid: check an available Mermaid renderer such as `mmdc --version` when present.
+- Mermaid CLI: run `mmdc --version`. If it succeeds, treat Mermaid CLI as available and use `mmdc` directly to render Mermaid diagrams when needed.
 - Java: `java -version`, when relevant to PlantUML.
 - Pandoc: `pandoc --version`.
 - DOCX: check whether `python-docx`, a document/DOCX tool, or another usable Word-generation mechanism is available.
@@ -37,17 +37,19 @@ A command counts as available only when it is found and its lightweight check ex
 
 Keep successful checks quiet unless the user asks for diagnostics. Report missing tools only when their absence affects the requested deliverable or causes a fallback.
 
-### Diagram tool priority
+### Diagram tool selection
 
-Use the following rendering priority for diagrams:
+Select the diagram tool by diagram semantics rather than forcing every diagram into UML:
 
-1. **PlantUML** — preferred when available.
-2. **Mermaid** — fallback when PlantUML is unavailable and a Mermaid renderer is usable.
-3. **Text/ASCII + structured description** — final fallback when neither renderer is usable.
+- **UML and software-architecture modeling**: prefer PlantUML when available. Examples include component, class, sequence, state, activity, deployment, and other UML-oriented diagrams.
+- **General flowcharts, tree/hierarchy diagrams, functional decomposition, mind maps, and general relationship diagrams**: prefer Mermaid.
+- If the preferred PlantUML path is unavailable, use Mermaid as the fallback when `mmdc` is available.
 
-When PlantUML is available and a diagram materially improves the HLD, actually use PlantUML to produce the diagram; do not ignore it and silently switch to another format. Preserve diagram source when practical.
+When `mmdc --version` succeeds, generate the `.mmd` source and invoke Mermaid CLI directly to render the diagram, preferably to SVG for document-quality vector output or PNG when required by the DOCX pipeline.
 
-If Mermaid source can be written but cannot be rendered for the requested final DOCX, do not present raw Mermaid source as a finished diagram in the Word document. Fall back to a structured text/table description or another renderable mechanism.
+Do **not** use Text/ASCII diagrams as finished HLD diagrams. If neither PlantUML nor Mermaid CLI can render a required diagram in the current environment, preserve the appropriate `.puml` or `.mmd` source and report that rendering must be completed in an environment with the corresponding renderer (for example, Windows with Mermaid CLI) before final document delivery.
+
+When PlantUML is available and a UML/software-architecture diagram materially improves the HLD, actually use PlantUML to produce it. When Mermaid is selected and `mmdc` is available, actually invoke `mmdc`; do not merely emit Mermaid source and treat it as a finished diagram.
 
 ## Select the working mode
 
@@ -85,7 +87,7 @@ Do not expose all tags in the final document unless useful, but preserve the dis
 8. Define or recover modules/components and their responsibilities, ownership, dependencies, and interfaces.
 9. Analyze important data, control flow, lifecycle, error/fault paths, and persistence where relevant.
 10. Analyze concurrency, state machines, performance/real-time constraints, and deployment only when they materially affect the architecture. Do not force them into standalone chapters by default.
-11. Generate diagrams only when they clarify structure or behavior. Use PlantUML > Mermaid > Text/ASCII according to the startup capability check. Follow `references/diagram-guide.md`.
+11. Generate diagrams only when they clarify structure or behavior. Select PlantUML or Mermaid by diagram semantics and use the detected CLI/rendering capability. Do not use Text/ASCII as a finished diagram fallback. Follow `references/diagram-guide.md`.
 12. Review the architecture for cohesion, coupling, dependency direction, ownership, cyclic dependencies, single points of failure, excessive shared state, unclear interfaces, and requirement coverage.
 13. Draft the content using the resolved template and the project-specific analysis.
 14. Run a consistency pass: every important architectural statement must be supported by evidence or clearly presented as a proposal/assumption.
