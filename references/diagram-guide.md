@@ -1,6 +1,6 @@
-# Diagram Guide
+# Diagram Tool and Delivery Guide
 
-This file owns diagram selection, rendering, and fallback rules. Use a small set of diagrams that clarify architecture; diagram count is not a quality target.
+This file owns tool selection, rendering, source/SVG/PNG assets, and fallback rules. Before authoring or reviewing an HLD diagram, apply [diagram-standards.md](diagram-standards.md) for semantics, abstraction levels, notation, layout, and the acceptance gate. Use a small set of diagrams that clarify architecture; diagram count is not a quality target.
 
 ## Select by meaning
 
@@ -87,6 +87,7 @@ ASCII drawings and raw Mermaid/PlantUML code are not finished Word diagrams. A M
 
 ## Semantic consistency
 
+- Apply the review gate in [diagram-standards.md](diagram-standards.md); rendering success does not establish semantic correctness.
 - Diagram identifiers match module/interface names in the document.
 - Arrows have intentional, preferably labeled meaning: dependency, control, data, or ownership.
 - Text and diagrams agree about interface direction, lifecycle, and boundaries.

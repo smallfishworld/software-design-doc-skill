@@ -202,6 +202,7 @@ software-design-doc-skill/
 │   ├── architecture-analysis.md
 │   ├── document-rules.md
 │   ├── platform-profiles.md
+│   ├── diagram-standards.md
 │   ├── diagram-guide.md
 │   ├── tool-integration.md
 │   └── docx-template.md
@@ -227,7 +228,8 @@ The skill favors high cohesion, low coupling, explicit dependencies, clear owner
 - Select requirements-first, code-first, or hybrid inputs independently of creation, incremental updates, or review-only output.
 - Reviews report impact-ordered findings with locations, evidence, consequences, corrections, and coverage; they do not force Word generation.
 - Probe only relevant capabilities using paths relative to the installed skill, not the current project directory.
-- Prefer PlantUML for UML/software architecture and Mermaid for general flows, trees, functional decomposition, and relationships. [Diagram Guide](references/diagram-guide.md) owns the full policy.
+- Prefer PlantUML for UML/software architecture and Mermaid for general flows, trees, functional decomposition, and relationships. [Diagram Guide](references/diagram-guide.md) owns tool, rendering, and format-fallback behavior.
+- Apply the [Diagram Standard](references/diagram-standards.md) before rendering: declare the view and abstraction level, define elements/boundaries/relationships, use explicit legends and labels, follow type-specific semantics, and pass the review gate. A successful render is not a valid architecture review.
 - Treat `.puml`/`.mmd` as the authoritative editable source. Prefer SVG for relative Markdown references and verified DOCX insertion; use high-resolution PNG as the compatibility fallback. SVG in Word offers vector scaling and limited graphic editing, not PlantUML/Mermaid semantic editing.
 - Version checks do not prove rendering works. If Mermaid cannot render on Linux, retain `.mmd` and Windows commands; label a Word file missing figures as a draft.
 - The Word template has a rebuild script. Check package integrity and actual page layout before delivery.

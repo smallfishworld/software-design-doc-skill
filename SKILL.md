@@ -80,7 +80,7 @@ Read the review section of [document-rules.md](references/document-rules.md). Le
 
 ## 6. Create useful diagrams
 
-Read [diagram-guide.md](references/diagram-guide.md) when diagrams clarify the design. It owns tool selection and fallback rules:
+When diagrams clarify the design, first apply [diagram-standards.md](references/diagram-standards.md) for view selection, semantics, notation, layout, and review acceptance; then apply [diagram-guide.md](references/diagram-guide.md) for tool selection, rendering, assets, and fallback:
 
 - UML (Unified Modeling Language，统一建模语言) / software architecture: PlantUML first; on failure/unavailability, try an appropriate Mermaid representation.
 - Flowcharts, trees, functional decomposition, and general relationships: Mermaid first.
@@ -96,6 +96,7 @@ In Markdown, reference the SVG by a relative path instead of embedding a generat
 - Important claims have locatable evidence or are explicitly proposals/assumptions.
 - Major requirements have architectural owners; critical interfaces and data have ownership and fault behavior.
 - Text, tables, diagrams, and identifiers agree; updates do not silently rewrite approved decisions.
+- Every finished diagram passes the semantic and visual review gate in `references/diagram-standards.md`; a successful render alone is insufficient. Pending figures remain explicitly identified as draft work.
 - Use the requested language; expand abbreviations with English full names and local-language meanings on first use where appropriate.
 - Required sections are filled, irrelevant samples removed, numbering consistent, and unknown metadata visible.
 - For Word: reopen the file, check fields/images/tables, render and inspect pages when a rendering tool is available. Report unverified layout or pending fields/figures precisely; do not claim checks that were not run.
