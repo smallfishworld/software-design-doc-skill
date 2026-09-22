@@ -11,6 +11,8 @@ Produce a software High-Level Design (HLD，软件概要设计) that is traceabl
 
 Identify the requested scope, language, output format, available inputs, and any company template. Preserve explicit choices and existing authorization. If the format is unspecified, follow an existing document's format; otherwise draft in Markdown without generating an unsolicited Word file.
 
+Before choosing a working representation, establish the **authoritative artifact**. If the user has manually edited an existing Word/DOCX file, asks to preserve that file, or the DOCX is newer than its Markdown mirror, treat the DOCX as the source of truth and Markdown as a secondary mirror. Baseline the current document before editing, record the requested edit scope, and never regenerate untouched chapters from an older Markdown copy. When modification times are available, check them before editing; otherwise infer authority from the user's explicit workflow.
+
 Select the input mode independently of the deliverable:
 
 | Input mode | Factual baseline | Main action |
@@ -40,6 +42,7 @@ The check creates no test artifacts. Command discovery/version success is **not*
 Read [document-rules.md](references/document-rules.md) for evidence, conflicts, and traceability. Classify important claims as `[REQ]`, `[CODE]`, `[DOC]`, `[DESIGN]`, `[ASSUMPTION]`, or `[TODO]`; retain a source locator for confirmed claims. The final document need not display every internal tag, but proposals and uncertainty must remain visible.
 
 - Requirements-first: derive responsibilities from capabilities and constraints. Technology, module, and interface choices are proposals unless explicitly required. Map major requirements to architectural owners and record consequential alternatives.
+- Functional requirements MUST be decomposed by user-visible capability, business function, use case, or workflow before they are mapped to software modules. Do not use source folders, files, classes, or existing module names as the requirement taxonomy merely because code is available. Code structure may identify the implementation owner only after the functional structure is clear.
 - Code-first: inspect active build targets, entry points, public interfaces, configuration, data ownership, and important flows. Naming and directory proximity do not prove dependencies. Check relevant symbols/files behind tool summaries; report analysis coverage and gaps.
 - Hybrid: keep requirement truth and implementation truth separate. “No implementation evidence found” is not proof of nonimplementation without sufficient coverage. Separate the current state from the proposed target state.
 
@@ -54,6 +57,8 @@ Work at system/module/interface granularity:
 3. Trace critical control/data flows, lifecycle, and fault/recovery paths end to end.
 4. Record significant choices, alternatives, consequences, and unresolved validation items.
 5. Check requirement coverage, cohesion, coupling, cycles, shared mutable state, and failure containment.
+
+Write from the outside in: explain the overall application architecture and dependency direction before drilling into a focal subsystem. In a section such as “Basic Design Concept / 基本设计概念”, prefer concise technical prose rather than a table: first describe the application-level architecture, then the subsystem design principles and the module names involved. Do not mention code paths, function names, or framework/runtime names unless they are explicitly required or architecturally significant.
 
 Analyze concurrency, state, timing, resource budgets, deployment, upgrade, and compatibility when they affect the architecture. When the built-in outline/template applies, treat **task/concurrency design, state behavior, performance/real-time/resource design, and deployment/upgrade/compatibility design as conditional candidate chapters**:
 
@@ -78,7 +83,7 @@ Use this template priority:
 
 A required company template controls chapter structure and styles; the default outline supplies content guidance only where compatible. Work on a copy of any template. Keep unknown administrative metadata pending, remove instructional/sample text, and remove irrelevant optional sections while fixing numbering and references. Keep security content proportional to actual trust boundaries and requirements.
 
-For Word output read [docx-template.md](references/docx-template.md) and the Word section of [tool-integration.md](references/tool-integration.md). Preserve template layout, styles, headers/footers, and fields. If Word cannot be created, deliver useful structured content and explicitly identify the conversion still needed; do not label it a completed DOCX.
+For Word output read [docx-template.md](references/docx-template.md) and the Word section of [tool-integration.md](references/tool-integration.md). Preserve template layout, styles, headers/footers, and fields. For an existing user-edited DOCX, use the DOCX-first incremental workflow: baseline the current file, lock the requested edit range, edit a copy/new output path, validate it, and only then replace or hand back the intended file. If Word cannot be created, deliver useful structured content and explicitly identify the conversion still needed; do not label it a completed DOCX.
 
 ### Review-only
 
@@ -88,8 +93,8 @@ Read the review section of [document-rules.md](references/document-rules.md). Le
 
 When diagrams clarify the design, first apply [diagram-standards.md](references/diagram-standards.md) for view selection, semantics, notation, layout, and review acceptance; then apply [diagram-guide.md](references/diagram-guide.md) for tool selection, rendering, assets, and fallback:
 
-- UML (Unified Modeling Language，统一建模语言) / software architecture: PlantUML first; on failure/unavailability, try an appropriate Mermaid representation.
-- Flowcharts, trees, functional decomposition, and general relationships: Mermaid first.
+- Formal UML (Unified Modeling Language，统一建模语言) views such as component, class, sequence, state, and deployment diagrams: PlantUML first.
+- Layered logical architecture, block diagrams, ordinary flowcharts, data pipelines, trees, functional decomposition, and general relationships: Mermaid first unless formal UML semantics are required.
 - Treat `.puml`/`.mmd` as the authoritative editable source. Render SVG (Scalable Vector Graphics，可缩放矢量图形) as the preferred presentation asset for Markdown and, when verified compatible, DOCX. Keep a high-resolution PNG (Portable Network Graphics，便携式网络图形) fallback when the document pipeline cannot reliably insert or render SVG.
 - Render actual sources when a local renderer is usable; validate the produced image, not just a version command or exit code.
 - If Mermaid cannot render on the current Linux environment, preserve `.mmd`, provide Windows `mmdc` commands, and identify the target section/caption. Insert rendered images before declaring the Word document final.
@@ -102,8 +107,10 @@ In Markdown, reference the SVG by a relative path instead of embedding a generat
 - Important claims have locatable evidence or are explicitly proposals/assumptions.
 - Major requirements have architectural owners; critical interfaces and data have ownership and fault behavior.
 - Text, tables, diagrams, and identifiers agree; updates do not silently rewrite approved decisions.
+- Functional requirements are organized by capability/workflow rather than by code layout, and the overall application architecture is explained before subsystem details.
+- Prose is concrete and project-specific: avoid repetitive AI-style scaffolding, generic slogans, and table-heavy restatement where normal paragraphs communicate better.
 - Every finished diagram passes the semantic and visual review gate in `references/diagram-standards.md`; a successful render alone is insufficient. Pending figures remain explicitly identified as draft work.
 - Use the requested language; expand abbreviations with English full names and local-language meanings on first use where appropriate.
 - Required sections are filled, irrelevant samples removed, numbering consistent, and unknown metadata visible.
-- For Word: reopen the file, check fields/images/tables, render and inspect pages when a rendering tool is available. Report unverified layout or pending fields/figures precisely; do not claim checks that were not run.
+- For Word: reopen the file, check fields/images/tables, render and inspect pages when a rendering tool is available. Validate table cell indentation and column widths, preserve code/identifier text exactly, and require every low-level XML/string replacement to report its hit count. Report unverified layout or pending fields/figures precisely; do not claim checks that were not run.
 - Deliver only requested outputs and necessary editable diagram sources. Distinguish a completed document, a draft awaiting figures, and a review report. Do not continue into implementation.
