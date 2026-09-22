@@ -12,6 +12,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: sync-default-docx-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   sync:
     if: github.actor != 'github-actions[bot]'
