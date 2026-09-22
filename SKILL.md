@@ -58,7 +58,7 @@ Work at system/module/interface granularity:
 4. Record significant choices, alternatives, consequences, and unresolved validation items.
 5. Check requirement coverage, cohesion, coupling, cycles, shared mutable state, and failure containment.
 
-Write from the outside in: explain the overall application architecture and dependency direction before drilling into a focal subsystem. In a section such as “Basic Design Concept / 基本设计概念”, prefer concise technical prose rather than a table: first describe the application-level architecture, then the subsystem design principles and the module names involved. Do not mention code paths, function names, or framework/runtime names unless they are explicitly required or architecturally significant.
+Write from the outside in: explain the **overall system architecture** and dependency direction before drilling into a focal subsystem. For code-first/brownfield work, this means recovering the architecture of the **entire code project/repository in scope**—its major layers, subsystems/modules, boundaries, shared services, external dependencies, and dependency direction—rather than starting from one application module or one feature. In a section such as “Basic Design Concept / 基本设计概念”, prefer concise technical prose rather than a table: first describe the system/codebase-level architecture, then the focal subsystem design principles and the module names involved. Do not mention code paths, function names, or framework/runtime names unless they are explicitly required or architecturally significant.
 
 Analyze concurrency, state, timing, resource budgets, deployment, upgrade, and compatibility when they affect the architecture. When the built-in outline/template applies, treat **task/concurrency design, state behavior, performance/real-time/resource design, and deployment/upgrade/compatibility design as conditional candidate chapters**:
 
@@ -107,7 +107,7 @@ In Markdown, reference the SVG by a relative path instead of embedding a generat
 - Important claims have locatable evidence or are explicitly proposals/assumptions.
 - Major requirements have architectural owners; critical interfaces and data have ownership and fault behavior.
 - Text, tables, diagrams, and identifiers agree; updates do not silently rewrite approved decisions.
-- Functional requirements are organized by capability/workflow rather than by code layout, and the overall application architecture is explained before subsystem details.
+- Functional requirements are organized by capability/workflow rather than by code layout, and the overall system architecture is explained before subsystem details; for an existing codebase, the overview covers the whole code project/repository in scope.
 - Prose is concrete and project-specific: avoid repetitive AI-style scaffolding, generic slogans, and table-heavy restatement where normal paragraphs communicate better.
 - Every finished diagram passes the semantic and visual review gate in `references/diagram-standards.md`; a successful render alone is insufficient. Pending figures remain explicitly identified as draft work.
 - Use the requested language; expand abbreviations with English full names and local-language meanings on first use where appropriate.
