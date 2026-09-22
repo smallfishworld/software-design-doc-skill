@@ -6,18 +6,50 @@ This file owns tool selection, rendering, source/SVG/PNG assets, and fallback ru
 
 | Diagram purpose | Preferred tool | Include when |
 | --- | --- | --- |
-| UML / architecture: context, component, class, sequence, state, activity, deployment | PlantUML | Boundaries or interactions need a modeled view |
-| General flowchart, data pipeline, tree, functional decomposition, mind map, relationship | Mermaid | Flow or hierarchy is clearer visually |
+| Formal UML: component, class, sequence, state, deployment; UML activity only when its semantics matter | PlantUML | Formal UML notation/semantics add value |
+| Layered logical architecture, block diagram, ordinary flowchart, data pipeline, tree, functional decomposition, mind map, general relationship | Mermaid | Clean hierarchy/flow/layout matters more than formal UML notation |
 
-Distinguish a UML activity model from a general flowchart by its semantics, not merely by the presence of arrows. A simple sequence within one module usually needs only prose. Use state diagrams only when explicit states govern behavior; place deployment and thread diagrams in their conditional candidate chapters only when they express a system-wide architectural view, otherwise keep them with the owning section.
+Distinguish a UML activity model from a general flowchart by its semantics, not merely by the presence of arrows. Prefer Mermaid for ordinary process flows and block diagrams; do not use PlantUML activity syntax merely because it is available. A simple sequence within one module usually needs only prose. Use state diagrams only when explicit states govern behavior; place deployment and thread diagrams in their conditional candidate chapters only when they express a system-wide architectural view, otherwise keep them with the owning section.
 
 For greenfield work, label proposed/optional elements. For existing systems, derive relationships from active code/configuration. Mark a simplified diagram as a logical view and distinguish observed architecture from a recommended target.
+
+For document-embedded figures, keep the figure title/caption in the DOCX/Markdown by default rather than rendering the same title inside the image. Design the source for the final page width, not for an unconstrained browser canvas.
+
+## Mermaid on Linux
+
+A working `mmdc` command can still fail when Chromium/Puppeteer is missing or sandboxing is blocked. Probe the actual render path. When an approved local Chrome/Chromium executable exists, a project-local Puppeteer config can be used:
+
+```json
+{
+  "executablePath": "/usr/bin/chromium",
+  "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+}
+```
+
+Use the actual executable path found on the machine; do not copy `/usr/bin/chromium` blindly.
+
+```bash
+mmdc -p puppeteer-config.json -i "flow.mmd" -o "flow.svg"
+```
+
+If SVG must be rasterized and Mermaid cannot emit a usable PNG, an installed `chrome-headless-shell` / Chrome headless executable may be used as a fallback:
+
+```bash
+chrome-headless-shell --headless --no-sandbox --disable-gpu \
+  --window-size=1800,1200 --screenshot="flow.png" "file:///absolute/path/flow.svg"
+```
+
+Validate the resulting crop and whitespace; a screenshot is not automatically a good document figure.
+
+## PlantUML layout control
+
+PlantUML auto-layout is useful but can scatter architectural blocks. For a genuinely layered view, group each layer in a package/rectangle and use hidden relationships only to control layout, while keeping real inter-layer relationships separately labeled. Hidden arrows are layout constraints only; never let them imply architecture semantics. If the block diagram is still unstable or visually cluttered, switch to Mermaid rather than accumulating layout hacks.
 
 ## Render and verify
 
 1. Save editable `.puml` or `.mmd` source with a descriptive name.
 2. Use the selected renderer on the actual diagram. A successful version check establishes command availability only; Mermaid may still lack a working browser and PlantUML may lack layout dependencies/fonts.
-3. Check the exit status and that a new nonempty image was produced. Do not reuse a stale output after failure. Open the image to check labels, fonts, arrow direction, clipping, and readability at the intended page width.
+3. Check the exit status and that a new nonempty image was produced. Do not reuse a stale output after failure. Open the image to check labels, fonts, arrow direction, clipping, and readability at the intended page width. If no vision-capable reviewer is available, run the automated geometry/structure fallback defined in `diagram-standards.md` and explicitly record that limitation.
 4. Generate SVG (Scalable Vector Graphics，可缩放矢量图形) as the preferred presentation asset. Generate a high-resolution PNG (Portable Network Graphics，便携式网络图形) fallback when the DOCX tool, converter, target Word version, or downstream renderer has not been verified with SVG.
 5. Insert the image with its caption in the matching section and check the rendered document page.
 

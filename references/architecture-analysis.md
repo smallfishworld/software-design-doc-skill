@@ -32,6 +32,8 @@ Extract the factors that materially shape the architecture:
 
 Do not list generic quality attributes unless they cause a concrete design consequence.
 
+Before module decomposition, structure functional requirements by actor goal, capability, use case, or workflow. Do not mirror the source directory or existing module tree into the requirements section. The codebase is used later to map each function to an implementation owner and to detect gaps or drift.
+
 ## 3. Define or recover module boundaries
 
 A useful module/component should have:
@@ -44,6 +46,8 @@ A useful module/component should have:
 - a change boundary that localizes likely future modifications.
 
 Prefer capability/domain boundaries over arbitrary directory boundaries when designing a new system.
+
+In the HLD narrative, describe the whole application's software architecture, major layers/subsystems, and dependency direction before focusing on a particular subsystem. A subsystem section should then explain its design principles and participating module names without dropping immediately into source paths or function-level structure.
 
 For existing code, directory structure is only one signal. Also inspect build targets, public headers, package manifests, dependency injection/configuration, route registration, IPC boundaries, schemas, and runtime initialization.
 

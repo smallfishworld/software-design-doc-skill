@@ -43,6 +43,21 @@ Keep the working table internal if it adds no reader value, but expose uncovered
 
 Check that every high-priority functional requirement has an owner in the architecture and that important non-functional requirements affect at least one concrete design decision.
 
+## Functional requirement decomposition
+
+Organize the requirements section by **what the system must do**, not by how the current source tree happens to be organized.
+
+A reliable sequence is:
+
+1. identify actors, goals, and externally visible workflows;
+2. group behavior into functional capabilities;
+3. decompose each capability into subfunctions/scenarios and key constraints;
+4. only then map those functions to modules, components, interfaces, and existing code.
+
+Source directories, files, classes, thread names, and historical module names are evidence about implementation ownership, not a default requirement taxonomy. Preserve a module-oriented requirement structure only when the authoritative requirement specification or the user explicitly requires it.
+
+When writing a “Basic Design Concept / 基本设计概念” section, use normal paragraphs by default. Explain the overall application software architecture first, then the focal subsystem's design principles and involved module names. Do not include code paths, symbol names, or operating-system/framework names unless they are needed to explain an architectural decision or the user explicitly asks for them.
+
 ## Granularity
 
 High-Level Design (HLD) should normally describe:
@@ -98,9 +113,17 @@ On first occurrence of an abbreviation, expand the English full name and add a l
 
 Do not repeatedly expand the same abbreviation after it has been introduced.
 
+## Writing style
+
+Write like an engineer explaining a design to another engineer. Prefer concrete subjects, actions, ownership, reasons, and consequences. Keep sentences varied and direct. Remove filler that could apply to any project.
+
+Avoid repeated AI-style scaffolding such as “综上所述”, “值得注意的是”, “本模块旨在”, repeated “通过……实现……” constructions, generic quality slogans, and paragraphs that only restate a heading. Do not manufacture symmetry by forcing every section into the same sentence pattern or the same number of bullets.
+
+Use lists only when the reader benefits from discrete items. Use prose for concepts, rationale, architecture narrative, and design principles.
+
 ## Tables
 
-Use tables when they compress structured information such as module responsibility, interfaces, dependencies, risks, assumptions, or requirement mapping. Do not convert all prose into tables.
+Use tables when they compress genuinely structured information such as module responsibility, interfaces, dependencies, risks, assumptions, or requirement mapping. Do not convert all prose into tables. Conceptual explanations and design rationale should normally remain paragraphs; in particular, do not turn “Basic Design Concept / 基本设计概念” into a table unless the supplied template requires it.
 
 ## Review checklist
 
@@ -131,6 +154,17 @@ Return an impact-ordered review rather than a replacement document. For each fin
 
 Separate confirmed defects, open questions, and optional improvements. Do not assign severity based solely on a preferred style. State inspected inputs/revisions and material coverage gaps, and explain any check that could not run. If no significant findings are supported, say so and retain the limitations.
 
-## Incremental updates
+## Incremental updates and DOCX-first handoff
 
-Read the existing artifact and identify affected requirements/modules before editing. Update dependent figures, interface tables, terminology, cross-references, and the revision record when appropriate. Do not mark a document approved or invent reviewers/dates. Preserve unrelated approved sections. Briefly report substantive changes and remaining decisions.
+Read the existing artifact and identify affected requirements/modules before editing. Update dependent figures, interface tables, terminology, cross-references, and the revision record when appropriate. Do not mark a document approved or invent reviewers/dates.
+
+When the user has edited the Word document directly, the DOCX is authoritative unless the user explicitly says otherwise. Apply this handoff discipline:
+
+1. establish a baseline before editing: document version/path, modification time when available, chapter/table/figure inventory, and obvious unresolved defects;
+2. record the user's requested edit range and treat everything else as frozen unless a dependency requires a change;
+3. do not regenerate earlier chapters from Markdown or another stale mirror;
+4. maintain a lightweight status list such as `approved / user-edited / pending / changed-this-pass` for affected sections and tables;
+5. after a multi-round session, run one full-document consistency check and close the accumulated TODO list instead of repeatedly fixing isolated symptoms;
+6. if a Markdown mirror is required, synchronize it **from the accepted DOCX state** after the Word edits, not the reverse.
+
+Preserve unrelated approved sections. Briefly report substantive changes, the exact scope touched, checks performed, and remaining decisions.

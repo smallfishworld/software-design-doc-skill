@@ -128,6 +128,9 @@ The target software system MUST be the clear focal element. Include only people/
 
 Use this as the default overall architecture view for a non-trivial HLD. It MAY use a C4-inspired boxes-and-arrows notation, but must remain explicit about element types.
 
+- Show the **whole application architecture first**; use separate drill-down diagrams for complex subsystems.
+- If the design is layered, the overall architecture diagram MUST look layered: use clearly separated horizontal bands (or another explicit layered arrangement), keep elements of one layer together, and make the allowed dependency direction obvious. Do not call a scattered component network a “layered architecture diagram”.
+- If the design is not actually layered, do not force it into layers; name and draw the real structure instead.
 - Choose one principal level: subsystem, layer, module, or component.
 - Show dependency direction and architecturally important interfaces/data paths.
 - Layers MUST not imply permitted dependencies that the arrows contradict.
@@ -230,7 +233,9 @@ The notation MUST remain understandable in grayscale and to readers with common 
 - Minimize line crossings, long return paths, diagonal lines, and manual direction hacks.
 - Keep labels close to their elements/relationships and avoid text placed over lines.
 - Do not use icons unless they add domain meaning; explain non-obvious icons.
-- A diagram MUST be readable at its final Markdown/DOCX page width. Split it instead of shrinking text below comfortable reading size.
+- A diagram MUST be readable at its final Markdown/DOCX page width. For a normal A4 portrait page, design for roughly 15–16 cm of usable figure width and an equivalent label size of about 9 pt or larger. Split overview/detail views instead of shrinking text to fit.
+- Keep the canvas compact. Large empty margins, very wide aspect ratios, or dozens of small nodes are defects even when the source technically renders. As a practical heuristic, split a view when it grows beyond roughly 12–16 primary elements or 4–5 nested groups unless the larger view remains clearly readable at page width.
+- When the document provides the figure caption, omit an internal diagram title by default.
 - Landscape orientation MAY be used when the document format supports it and splitting would destroy the relationship being explained.
 
 Decorative shadows, gradients, 3D boxes, vendor logos, and excessive colors SHOULD be avoided in formal HLD diagrams.
@@ -260,7 +265,8 @@ A diagram fails review if any of the following is true:
 - external/internal, current/proposed, or logical/deployment boundaries are ambiguous;
 - it contradicts the HLD text, interface tables, or observed implementation;
 - it claims unsupported technology, timing, priority, protocol, or resource values;
-- it is unreadable at final page width, clipped after rendering, or dominated by crossing lines;
+- it is unreadable at final page width, clipped after rendering, oversized enough to require tiny text, dominated by crossing lines, or contains excessive empty canvas;
+- it is described as a layered architecture but the visual layout does not preserve clear layer bands and dependency direction;
 - no editable `.puml`/`.mmd` source is retained for a generated diagram;
 - a required SVG/PNG referenced by Markdown or DOCX is missing or stale.
 
@@ -274,7 +280,19 @@ Before accepting a diagram, verify:
 - legend and abbreviations are sufficient for the intended audience;
 - source, SVG, fallback PNG (when needed), caption, and document reference use matching names.
 
-## 13. References
+## 13. Degraded review when no vision-capable reviewer is available
+
+If no model/person capable of visually inspecting the rendered image is available, do not silently treat the visual gate as passed. Perform a degraded automated review and state the limitation.
+
+At minimum:
+
+- parse the `.puml` / `.mmd` source to confirm the intended nodes, groups, directions, and labels are present;
+- inspect SVG `viewBox`, width/height, text/font sizes, and bounding geometry when practical;
+- for PNG, use PIL or an equivalent local image library to measure dimensions, content bounding box, excessive whitespace, and obvious clipping;
+- verify the figure fits the target DOCX page-width budget without requiring unreadably small text;
+- mark the result as “automated geometry/structure check only; no human/vision visual review” when that is the actual coverage.
+
+## 14. References
 
 - [OMG UML 2.5.1 specification](https://www.omg.org/spec/UML/2.5.1/PDF) — authoritative UML semantics and notation.
 - [C4 model notation](https://c4model.com/diagrams/notation) — titles, element descriptions, relationship labels, protocols, legends, and accessible use of color.

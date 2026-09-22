@@ -60,9 +60,41 @@ When generating the final Word document:
 - Delete optional sections that are irrelevant rather than filling them with generic text.
 - Apply the three-level candidate decision above; do not retain all four chapters mechanically.
 - Insert architecture, data-flow, or sequence diagrams into the matching sections when they add value.
-- Keep diagrams readable on A4 pages and give them descriptive captions when appropriate.
+- Keep diagrams readable on A4 pages and give them descriptive captions when appropriate. Do not duplicate the same title inside the rendered diagram when the document caption already provides it.
 - Keep source-code-level detail out of the HLD unless it materially explains an architectural decision.
 - Keep factual implementation statements separate from proposed design decisions in greenfield/hybrid work.
+
+## Safe editing of an existing DOCX
+
+When modifying an existing Word file, preservation is more important than convenience.
+
+- If the user has edited the DOCX directly, treat that DOCX as the source of truth; do not rebuild unaffected chapters from Markdown.
+- Never edit in place first. Write to a new output path, reopen and validate it, then replace/copy over the intended destination only after checks pass. Keep a backup of the accepted input.
+- Do **not** parse `word/document.xml` (or another complex Word XML part) with ElementTree/lxml and serialize the entire part merely to make a local edit. Whole-part reserialization can rewrite namespace prefixes and extension markup; Word compatibility metadata such as `mc:Ignorable` may refer to prefix names as literal attribute values, so a syntactically parseable rewrite can still become incompatible or invalid to Word. Use `python-docx` for structures it safely supports, or exact raw-XML block replacement for preservation-sensitive edits.
+- For raw XML work, isolate exact `<w:tbl>...</w:tbl>`, `<w:tr>...</w:tr>`, `<w:tc>...</w:tc>`, `<w:p>...</w:p>`, or `<w:r>...</w:r>` blocks and edit only the required block before concatenating the untouched XML back around it.
+- Do not use `re.S` / DOTALL expressions that can cross Word run or paragraph boundaries. A regex intended for one text node should use a bound such as `[^<]*` so it cannot consume adjacent runs.
+- Distinguish “replace the complete run/text node” from “replace a substring inside one text node”. Every replacement MUST report the number of matches; zero matches or more matches than expected is an error, not a silent success.
+- Avoid opening a DOCX ZIP for output at the same path while it is still the input source. Read from the accepted source and write a separate package.
+
+## Table layout requirements
+
+Word tables need explicit paragraph and width rules; visual alignment cannot be inferred from text alone.
+
+- Cover/metadata tables SHOULD be narrower and centered. Do not default them to the full usable page width. Body data tables MAY use the full text width when that improves readability.
+- Paragraphs inside table cells MUST NOT inherit the body first-line indent. Set `w:ind w:firstLine="0"` (or the equivalent paragraph API) for cell paragraphs while preserving the normal body first-line indent outside tables.
+- `w:tblGrid/w:gridCol@w:w` and each corresponding cell `w:tcW@w:w` MUST agree. Updating only one representation is invalid because Word may render from the grid.
+- Preserve code and identifiers exactly, including case and spaces. For code-like cells, use a monospaced font such as Consolas around 9 pt when compatible with the template. Insert explicit `<w:br/>` only at intentional logical breakpoints; do not rely on Word's arbitrary wrapping to separate tokens.
+
+## Post-generation machine validation
+
+Before visual delivery, run machine checks that can catch corruption early:
+
+1. ZIP/CRC integrity and XML parseability for all changed XML parts.
+2. Exact round-trip comparison for known code/identifier text after DOCX extraction; source snippets are the primary oracle.
+3. Heuristic scans for suspicious token corruption, such as altered C/C++ keywords (`int`, `void`, `bool`, `const`) or accidental token concatenation/case changes.
+4. Table-cell paragraph indentation: `firstLine` absent/zero inside cells, while ordinary body paragraph indentation remains untouched.
+5. `tblGrid` and `tcW` width consistency for every non-merged table row that was edited.
+6. Reopen the generated DOCX and inspect the affected tables/figures after rendering when a rendering tool is available.
 
 ## Table of contents and fields
 

@@ -14,7 +14,7 @@ python3 /path/to/software-design-doc/scripts/check_environment.py --scope diagra
 
 No arguments checks all optional local integrations. `PLANTUML_JAR` is also supported. The script requires Python 3.9+ and the standard library; it reports missing capabilities without failing the core workflow. Exit status zero means the diagnostic completed, not that all tools are installed. The `available` property means a command/import probe succeeded, not that a real render succeeded.
 
-Do not generate test diagrams just for discovery. Verify actual outputs later. Inspect agent-exposed document and repository tools separately; the script cannot enumerate them. Text-only reviews need no renderer probes. Keep successful checks quiet and mention limitations only when they affect deliverables.
+Do not generate test diagrams just for discovery. Verify actual outputs later. Inspect agent-exposed document and repository tools separately; the script cannot enumerate them. Before depending on a DOCX/Office MCP, perform one harmless capability probe (for example, open/read metadata on the target copy). A configured tool whose bridge/script path is missing is unavailable; fall back immediately instead of routing every edit through a broken integration. Text-only reviews need no renderer probes. Keep successful checks quiet and mention limitations only when they affect deliverables.
 
 ## Code intelligence / CodeGraph
 
@@ -45,14 +45,15 @@ If the user requests a Word document, resolve the DOCX template first:
 
 Prefer direct local DOCX manipulation when a template must be preserved.
 
-Possible local methods, in preference order when available:
+Possible local methods, chosen by edit type and fidelity:
 
-1. A reliable DOCX/document MCP or document-editing tool that can open and modify an existing `.docx` template.
-2. `python-docx` or equivalent local library for creating/modifying DOCX files.
-3. Microsoft Word COM automation on Windows when exact Word behaviors such as TOC refresh or advanced fields are required.
-4. Pandoc when the workflow is naturally Markdown-first and exact template fidelity is not critical.
+1. A reliable DOCX/document MCP or document-editing tool **after an actual capability probe succeeds**.
+2. `python-docx` or equivalent local library for structures it preserves reliably.
+3. Exact raw-OOXML string/block replacement for narrow preservation-sensitive edits that high-level libraries cannot express safely; follow the no-whole-document-serialization and no-cross-run-regex rules in `docx-template.md`.
+4. Microsoft Word COM automation on Windows when exact Word behaviors such as TOC refresh or advanced fields are required.
+5. Pandoc only when the workflow is genuinely Markdown-first and exact template fidelity is not critical.
 
-When a template is used, work on a copy and preserve its styles, headings, headers/footers, tables, and document conventions as far as the selected tool permits.
+When a template is used, work on a copy and preserve its styles, headings, headers/footers, tables, and document conventions as far as the selected tool permits. If the user has already edited the Word document, prefer DOCX-first incremental editing over regenerating the file from Markdown.
 
 When no company/project template exists, use the built-in standardized DOCX template rather than starting a blank Word document.
 
@@ -82,6 +83,10 @@ When requirements are supplied as DOCX/PDF/Markdown/text:
 - distinguish mandatory requirements from examples, commentary, or historical notes.
 
 If a requirement document cannot be read in the current environment, do not invent its contents. Use any text provided by the user and mark missing source material as unresolved.
+
+## Project-local build and workflow instructions
+
+Before running project-specific build, generation, or validation commands, read local instructions such as `CLAUDE.md`, `AGENTS.md`, `BUILDING.md`, README build sections, or wrapper scripts. A repository-specific command such as a build launcher belongs in that project's instructions/memory, not as a hard-coded rule in this generic skill. The skill should enforce “discover and follow project-local build rules first”, not memorize one project's command.
 
 ## Intranet/offline operation
 
