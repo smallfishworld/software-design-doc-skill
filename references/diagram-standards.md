@@ -31,18 +31,21 @@ Every diagram MUST answer one architectural question and declare its view type a
 
 Do not mix multiple abstraction levels merely to fit everything on one page. If readers need both the whole system and module detail, create a parent view and one or more scoped child views with explicit drill-down names.
 
-## 3. Required diagram identity
+## 3. Diagram identity and document captions
 
-Each diagram MUST provide, either inside the image or in its immediately associated figure caption/legend:
+For diagrams embedded in a Word/DOCX or Markdown design document, the **document figure caption is the canonical title**. Do not duplicate the title inside the rendered UML/architecture image unless the user/template explicitly requires an internal title. This keeps diagrams compact and avoids wasting vertical space.
 
-- a specific title containing the view type and subject, for example `Logical Architecture — Device Management Service`;
+A standalone exported diagram MAY include an internal title when it must make sense outside the document.
+
+The diagram and its surrounding caption/text together MUST make clear:
+
+- the view type and subject;
 - the scope or boundary being shown;
 - the viewpoint when it is not obvious, such as logical, runtime, deployment, current state, or target state;
-- a legend for every nonstandard shape, color, icon, border, arrowhead, or line style;
-- expansions for abbreviations that the intended audience may not know.
+- the meaning of every nonstandard shape, color, icon, border, arrowhead, or line style;
+- abbreviations that the intended audience may not know.
 
-Avoid generic titles such as `Architecture Diagram`, `Flowchart`, or `Module Diagram` without a subject and scope.
-
+Avoid generic captions such as `Architecture Diagram`, `Flowchart`, or `Module Diagram` without a subject and scope.
 ## 4. Elements and boundaries
 
 ### 4.1 Element information
