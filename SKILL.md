@@ -25,6 +25,8 @@ For **review-only**, apply the relevant input mode but return findings, not a re
 
 Ask only when an unresolved choice materially changes scope or architecture and cannot be handled as an explicit assumption. Continue other useful work. Do not invent unavailable input contents or exact implementation parameters.
 
+Keep the **skill itself domain-neutral**. Rules, examples, and built-in templates must not hard-code subsystem names, business terms, or project-specific concepts learned from one user's project. Use neutral placeholders such as `target subsystem`, `business module`, `platform service`, or `external dependency`. Project-specific names belong only in the generated document when they come from that project's requirements, code, or explicit user input.
+
 ## 2. Check capabilities relevant to this deliverable
 
 Perform a lightweight capability check before analysis/drafting, scoped to the selected output. Resolve bundled paths relative to this `SKILL.md`, not the user's current project directory.
