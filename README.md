@@ -26,6 +26,8 @@ This skill is intended to finish at the software high-level design document. It 
 - Start from zero with only a requirement document or even plain-text requirements
 - Requirements-driven design works without an existing code project
 - Requirements and source-code driven design instead of generic prose generation
+- Functional requirements are decomposed by user capability/workflow before mapping to code/modules
+- DOCX-first safe incremental editing when users have already modified the Word document
 - Evidence-aware writing: distinguishes confirmed facts, requirements, design proposals, assumptions, and unresolved items
 - Architecture, module, data, interface, exception, logging, security, testability, maintainability, and risk analysis
 - Adaptive profiles for backend, web, desktop, embedded Linux, RTOS, MCU, and other software projects
@@ -232,7 +234,7 @@ The skill favors high cohesion, low coupling, explicit dependencies, clear owner
 - Select requirements-first, code-first, or hybrid inputs independently of creation, incremental updates, or review-only output.
 - Reviews report impact-ordered findings with locations, evidence, consequences, corrections, and coverage; they do not force Word generation.
 - Probe only relevant capabilities using paths relative to the installed skill, not the current project directory.
-- Prefer PlantUML for UML/software architecture and Mermaid for general flows, trees, functional decomposition, and relationships. [Diagram Guide](references/diagram-guide.md) owns tool, rendering, and format-fallback behavior.
+- Prefer PlantUML for formal UML views; prefer Mermaid for layered logical architecture, block diagrams, general flows, trees, functional decomposition, and relationships. [Diagram Guide](references/diagram-guide.md) owns tool, rendering, and format-fallback behavior.
 - Apply the [Diagram Standard](references/diagram-standards.md) before rendering: declare the view and abstraction level, define elements/boundaries/relationships, use explicit legends and labels, follow type-specific semantics, and pass the review gate. A successful render is not a valid architecture review.
 - Treat `.puml`/`.mmd` as the authoritative editable source. Prefer SVG for relative Markdown references and verified DOCX insertion; use high-resolution PNG as the compatibility fallback. SVG in Word offers vector scaling and limited graphic editing, not PlantUML/Mermaid semantic editing.
 - Version checks do not prove rendering works. If Mermaid cannot render on Linux, retain `.mmd` and Windows commands; label a Word file missing figures as a draft.
