@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 from docx import Document
-from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -36,10 +36,22 @@ def field(paragraph, instruction, hint=""):
         run._r.append(el)
 
 
-def table(doc, headers, rows, widths):
+def table(doc, headers, rows, widths, *, alignment=WD_TABLE_ALIGNMENT.LEFT):
     t = doc.add_table(rows=1, cols=len(headers))
     t.autofit = False
+    t.alignment = alignment
     t.style = "Table Grid"
+
+    width_twips = [Cm(width).twips for width in widths]
+    tbl_w = t._tbl.tblPr.first_child_found_in("w:tblW")
+    if tbl_w is None:
+        tbl_w = OxmlElement("w:tblW")
+        t._tbl.tblPr.append(tbl_w)
+    tbl_w.set(qn("w:type"), "dxa")
+    tbl_w.set(qn("w:w"), str(sum(width_twips)))
+
+    for grid_col, twips in zip(t._tbl.tblGrid.gridCol_lst, width_twips):
+        grid_col.set(qn("w:w"), str(twips))
     for col, width in zip(t.columns, widths):
         col.width = Cm(width)
     for i, text in enumerate(headers):
@@ -52,14 +64,19 @@ def table(doc, headers, rows, widths):
     for ri, row in enumerate(t.rows):
         no_split = OxmlElement("w:cantSplit")
         row._tr.get_or_add_trPr().append(no_split)
-        for cell, width in zip(row.cells, widths):
+        for cell, width, twips in zip(row.cells, widths, width_twips):
             cell.width = Cm(width)
+            tc_w = cell._tc.get_or_add_tcPr().get_or_add_tcW()
+            tc_w.set(qn("w:type"), "dxa")
+            tc_w.set(qn("w:w"), str(twips))
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
             if ri == 0:
                 shading = OxmlElement("w:shd")
                 shading.set(qn("w:fill"), "E8EDF2")
                 cell._tc.get_or_add_tcPr().append(shading)
             for p in cell.paragraphs:
+                p.paragraph_format.first_line_indent = Pt(0)
+                p.paragraph_format.left_indent = Pt(0)
                 p.paragraph_format.space_after = Pt(5)
                 p.paragraph_format.space_before = Pt(5)
                 for run in p.runs:
@@ -132,7 +149,7 @@ def build(output: Path):
         ["文档编号", "{{DOC_ID}}"], ["版本", "{{VER}}"], ["编制", "{{AUTHOR}}"],
         ["审核与批准", "{{REVIEWER}} / {{APPROVER}}"], ["日期", "{{DATE}}"],
         ["密级与状态", "{{CONF}} / {{STATUS}}"],
-    ], [4, 12.6])
+    ], [3.2, 8.4], alignment=WD_TABLE_ALIGNMENT.CENTER)
 
     doc.add_page_break()
     doc.add_paragraph("文档控制", "Title")
