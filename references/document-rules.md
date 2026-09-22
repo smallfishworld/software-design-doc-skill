@@ -56,7 +56,7 @@ A reliable sequence is:
 
 Source directories, files, classes, thread names, and historical module names are evidence about implementation ownership, not a default requirement taxonomy. Preserve a module-oriented requirement structure only when the authoritative requirement specification or the user explicitly requires it.
 
-When writing a “Basic Design Concept / 基本设计概念” section, use normal paragraphs by default. Explain the overall application software architecture first, then the focal subsystem's design principles and involved module names. Do not include code paths, symbol names, or operating-system/framework names unless they are needed to explain an architectural decision or the user explicitly asks for them.
+When writing a “Basic Design Concept / 基本设计概念” section, use normal paragraphs by default. Explain the **overall system software architecture** first. When source code exists, this overview should represent the **entire code project/repository in scope** at HLD level: major layers/subsystems/modules, responsibility boundaries, shared/platform services, important external dependencies, and dependency direction. Then explain the focal subsystem's design principles and involved module names. Do not include code paths, symbol names, or operating-system/framework names unless they are needed to explain an architectural decision or the user explicitly asks for them.
 
 ## Granularity
 
