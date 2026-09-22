@@ -141,4 +141,4 @@ python3 scripts/build_default_template.py
 python3 -m unittest discover -s tests -v
 ```
 
-Run from the repository root. For a preview, use `--output /path/to/preview.docx`. After a layout change, render and visually inspect the rebuilt template before committing it. Keep the 13 default chapter meanings aligned with `default-outline.md`; unused optional chapters must be removed and renumbered in the final project document. Commit DOCX as binary through Git (or a base64-aware API); do not pass it through a UTF-8 text update endpoint.
+Run from the repository root. For a preview, use `--output /path/to/preview.docx`. After a layout change, render and visually inspect the rebuilt template before committing it. Keep the 17 default chapter meanings aligned with `default-outline.md`; unused optional chapters must be removed and renumbered in the final project document. Commit DOCX as binary through Git (or a base64-aware API); do not pass it through a UTF-8 text update endpoint.
