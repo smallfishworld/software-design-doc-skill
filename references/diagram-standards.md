@@ -128,7 +128,7 @@ The target software system MUST be the clear focal element. Include only people/
 
 Use this as the default overall architecture view for a non-trivial HLD. It MAY use a C4-inspired boxes-and-arrows notation, but must remain explicit about element types.
 
-- Show the **whole application architecture first**; use separate drill-down diagrams for complex subsystems.
+- Show the **overall system architecture first**. For an existing codebase, the parent logical architecture view MUST cover the **entire code project/repository in scope** at the chosen HLD abstraction level, rather than only one application module, feature, or subsystem. Use separate drill-down diagrams for complex subsystems.
 - If the design is layered, the overall architecture diagram MUST look layered: use clearly separated horizontal bands (or another explicit layered arrangement), keep elements of one layer together, and make the allowed dependency direction obvious. Do not call a scattered component network a “layered architecture diagram”.
 - If the design is not actually layered, do not force it into layers; name and draw the real structure instead.
 - Choose one principal level: subsystem, layer, module, or component.
