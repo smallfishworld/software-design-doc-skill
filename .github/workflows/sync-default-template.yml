@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - scripts/build_default_template.py
+      - scripts/validate_docx.py
       - tests/test_skill.py
       - .github/workflows/sync-default-template.yml
 
