@@ -113,6 +113,12 @@ On first occurrence of an abbreviation, expand the English full name and add a l
 
 Do not repeatedly expand the same abbreviation after it has been introduced.
 
+## Domain neutrality of the skill
+
+The reusable skill, its reference rules, examples, and default templates must remain domain-neutral. Do not promote a subsystem name, business object, device type, protocol, product term, or codebase-specific concept from one project into the generic skill.
+
+Use neutral wording such as `system`, `subsystem`, `module`, `service`, `platform layer`, `device adapter`, or `external dependency` in the skill itself. Use real domain names only in the project document being generated, and only when they are supported by that project's requirements, source code, existing documents, or explicit user instructions.
+
 ## Writing style
 
 Write like an engineer explaining a design to another engineer. Prefer concrete subjects, actions, ownership, reasons, and consequences. Keep sentences varied and direct. Remove filler that could apply to any project.
