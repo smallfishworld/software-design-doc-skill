@@ -18,6 +18,10 @@ spec = importlib.util.spec_from_file_location("check_environment", ROOT / "scrip
 env = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = env
 spec.loader.exec_module(env)
+validator_spec = importlib.util.spec_from_file_location("validate_docx", ROOT / "scripts/validate_docx.py")
+validator = importlib.util.module_from_spec(validator_spec)
+sys.modules[validator_spec.name] = validator
+validator_spec.loader.exec_module(validator)
 NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 
 
@@ -152,6 +156,22 @@ class PackageTests(unittest.TestCase):
                             self.assertEqual(ind.get(w_first_line), "0",
                                              f"table {ti} row {ri} cell {ci} inherited firstLine")
                 self.assertEqual(grid, widths, f"table {ti} row {ri} tblGrid/tcW mismatch")
+    def test_default_template_passes_strict_docx_validator(self):
+        findings = validator.validate_docx(
+            ROOT / "templates/default-software-design-template.docx",
+            expected=["软件概要设计说明书"],
+            strict_tables=True,
+        )
+        self.assertEqual([], findings)
+
+    def test_docx_validator_reports_missing_exact_text(self):
+        findings = validator.validate_docx(
+            ROOT / "templates/default-software-design-template.docx",
+            expected=["__definitely_missing_identifier__"],
+            strict_tables=True,
+        )
+        self.assertTrue(any(f.code == "EXPECTED_TEXT_MISSING" for f in findings))
+
     def test_internal_markdown_links_resolve(self):
         for md in ROOT.rglob("*.md"):
             content = re.sub(r"```.*?```", "", md.read_text(), flags=re.S)
