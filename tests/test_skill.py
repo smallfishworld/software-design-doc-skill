@@ -119,6 +119,39 @@ class PackageTests(unittest.TestCase):
         ):
             self.assertIn(heading, text)
 
+    def test_cover_metadata_table_is_narrow_and_centered(self):
+        with ZipFile(ROOT / "templates/default-software-design-template.docx") as z:
+            body = ET.fromstring(z.read("word/document.xml"))
+        first_table = body.find(".//w:tbl", NS)
+        self.assertIsNotNone(first_table)
+        tbl_w = first_table.find("w:tblPr/w:tblW", NS)
+        jc = first_table.find("w:tblPr/w:jc", NS)
+        self.assertIsNotNone(tbl_w)
+        self.assertIsNotNone(jc)
+        self.assertLess(int(tbl_w.get(f'{{{NS["w"]}}}w')), 8000)
+        self.assertEqual(jc.get(f'{{{NS["w"]}}}val'), "center")
+
+    def test_table_cells_have_no_body_indent_and_grid_widths_match(self):
+        with ZipFile(ROOT / "templates/default-software-design-template.docx") as z:
+            body = ET.fromstring(z.read("word/document.xml"))
+        w_width = f'{{{NS["w"]}}}w'
+        w_first_line = f'{{{NS["w"]}}}firstLine'
+        for ti, table in enumerate(body.findall(".//w:tbl", NS)):
+            grid = [int(c.get(w_width)) for c in table.findall("w:tblGrid/w:gridCol", NS)]
+            self.assertTrue(grid, f"table {ti} has no tblGrid")
+            for ri, row in enumerate(table.findall("w:tr", NS)):
+                cells = row.findall("w:tc", NS)
+                widths = []
+                for ci, cell in enumerate(cells):
+                    tc_w = cell.find("w:tcPr/w:tcW", NS)
+                    self.assertIsNotNone(tc_w, f"table {ti} row {ri} cell {ci} missing tcW")
+                    widths.append(int(tc_w.get(w_width)))
+                    for p in cell.findall("w:p", NS):
+                        ind = p.find("w:pPr/w:ind", NS)
+                        if ind is not None and ind.get(w_first_line) is not None:
+                            self.assertEqual(ind.get(w_first_line), "0",
+                                             f"table {ti} row {ri} cell {ci} inherited firstLine")
+                self.assertEqual(grid, widths, f"table {ti} row {ri} tblGrid/tcW mismatch")
     def test_internal_markdown_links_resolve(self):
         for md in ROOT.rglob("*.md"):
             content = re.sub(r"```.*?```", "", md.read_text(), flags=re.S)
