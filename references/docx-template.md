@@ -96,6 +96,16 @@ Before visual delivery, run machine checks that can catch corruption early:
 5. `tblGrid` and `tcW` width consistency for every non-merged table row that was edited.
 6. Reopen the generated DOCX and inspect the affected tables/figures after rendering when a rendering tool is available.
 
+Use the bundled validator for the mechanical checks:
+
+```bash
+python3 scripts/validate_docx.py output.docx --strict-tables
+python3 scripts/validate_docx.py output.docx --strict-tables \
+  --expect-text "ACOUSTIC_DETECT_MODE mode_id" --scan-code
+```
+
+For a document containing many critical identifiers, place one exact expected string per line in a UTF-8 file and pass `--expect-file expected-identifiers.txt`. Exact expected-text checks are stronger than heuristic keyword scans and should be preferred when source Markdown/code is available.
+
 ## Table of contents and fields
 
 The DOCX contains Word fields for the table of contents and page numbers.
