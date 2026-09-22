@@ -1,0 +1,40 @@
+name: Sync default DOCX template
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/build_default_template.py
+      - tests/test_skill.py
+      - .github/workflows/sync-default-template.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install template dependency
+        run: python -m pip install python-docx
+      - name: Rebuild default template
+        run: python scripts/build_default_template.py
+      - name: Run skill tests
+        run: python -m unittest discover -s tests -v
+      - name: Commit regenerated template when changed
+        shell: bash
+        run: |
+          if git diff --quiet -- templates/default-software-design-template.docx; then
+            echo 'Default template already up to date.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add templates/default-software-design-template.docx
+          git commit -m 'chore: rebuild default DOCX template'
+          git push
