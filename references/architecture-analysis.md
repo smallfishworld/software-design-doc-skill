@@ -47,7 +47,7 @@ A useful module/component should have:
 
 Prefer capability/domain boundaries over arbitrary directory boundaries when designing a new system.
 
-In the HLD narrative, describe the whole application's software architecture, major layers/subsystems, and dependency direction before focusing on a particular subsystem. A subsystem section should then explain its design principles and participating module names without dropping immediately into source paths or function-level structure.
+In the HLD narrative, describe the **whole system's software architecture** before focusing on a particular subsystem. For brownfield/code-first work, recover this from the **entire code project/repository in scope**, not from one app folder or one feature: identify major layers/subsystems/modules, responsibility boundaries, shared/platform services, important external dependencies, and dependency direction. A subsystem section should then explain its design principles and participating module names without dropping immediately into source paths or function-level structure.
 
 For existing code, directory structure is only one signal. Also inspect build targets, public headers, package manifests, dependency injection/configuration, route registration, IPC boundaries, schemas, and runtime initialization.
 
